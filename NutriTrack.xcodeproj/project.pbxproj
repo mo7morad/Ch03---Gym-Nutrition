@@ -10,9 +10,22 @@
 		14DF200A2FC5229500516055 /* NutriTrack.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NutriTrack.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		14DF20182FC5229500516055 /* Exceptions for "NutriTrack" folder in "NutriTrack" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/Info.plist,
+			);
+			target = 14DF20092FC5229500516055 /* NutriTrack */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		14DF200C2FC5229500516055 /* NutriTrack */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				14DF20182FC5229500516055 /* Exceptions for "NutriTrack" folder in "NutriTrack" target */,
+			);
 			path = NutriTrack;
 			sourceTree = "<group>";
 		};
