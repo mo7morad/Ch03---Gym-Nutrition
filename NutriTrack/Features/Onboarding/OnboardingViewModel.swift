@@ -60,8 +60,10 @@ final class OnboardingViewModel {
 
     func advance() {
         switch currentStep {
-        case .personalInfo:  currentStep = .goalSelection
-        case .goalSelection: currentStep = .summary
+        case .personalInfo:
+            currentStep = .goalSelection
+        case .goalSelection:
+            currentStep = .summary
         case .summary:       break  // completion is handled by complete(), not advance()
         }
     }
