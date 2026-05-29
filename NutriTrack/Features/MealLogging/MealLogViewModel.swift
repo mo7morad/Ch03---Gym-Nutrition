@@ -13,7 +13,6 @@ final class MealLogViewModel {
 
     enum Step {
         case capturing                 // camera is open
-        case confirmingPhoto(UIImage)  // user reviews the shot before committing
         case analyzing(UIImage)        // waiting for mock/AI to respond
         case result([FoodItem])        // food items detected, ready to log
     }
@@ -28,10 +27,6 @@ final class MealLogViewModel {
     private let analysisService: any FoodAnalysisService = FoodAnalysisServiceMock()
 
     // MARK: - Navigation
-
-    func photoTaken(_ image: UIImage) {
-        step = .confirmingPhoto(image)
-    }
 
     func retake() {
         step = .capturing

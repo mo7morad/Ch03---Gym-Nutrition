@@ -27,20 +27,9 @@ struct MealLogView: View {
             case .capturing:
                 PhotoCaptureView(
                     onPhotoCaptured: { image in
-                        viewModel.photoTaken(image)
+                        Task { await viewModel.usePhoto(image) }
                     },
                     onCancel: onCancel
-                )
-
-            case .confirmingPhoto(let image):
-                PhotoConfirmationView(
-                    image: image,
-                    onRetake: { viewModel.retake() },
-                    onUsePhoto: {
-                        // usePhoto is async — wrap it in Task so we don't block the UI.
-                        // This is identical to how SummaryStepView calls viewModel.complete().
-                        Task { await viewModel.usePhoto(image) }
-                    }
                 )
 
             case .analyzing(let image):
@@ -83,7 +72,6 @@ extension MealLogViewModel.Step {
     var id: String {
         switch self {
         case .capturing:         return "capturing"
-        case .confirmingPhoto:   return "confirmingPhoto"
         case .analyzing:         return "analyzing"
         case .result:            return "result"
         }
