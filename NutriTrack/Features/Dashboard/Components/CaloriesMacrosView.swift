@@ -44,6 +44,7 @@ struct CaloriesMacrosView: View {
                             .font(.system(size: 22))
                             .foregroundStyle(Color(hex: "181818"))
                             .opacity(0.4)
+                            .rotationEffect(.degrees(isExpanded ? 180 : 0))
                     }
                 }
                 .padding(.bottom, 3)
@@ -84,7 +85,7 @@ struct CaloriesMacrosView: View {
                 Rectangle()
                     .fill(Color.gray.opacity(0.2))
                     .frame(height: 2)
-                    .padding(.vertical, 10)
+                    .padding(.top, 10)
                 
                 Grid(){
                     GridRow{
@@ -97,12 +98,12 @@ struct CaloriesMacrosView: View {
                         .overlay(alignment: .bottom){
                             Rectangle()
                                 .fill(Color.gray.opacity(0.2))
-                                .frame(width:120, height: 2)
+                                .frame(width:110, height: 2)
                         }
                         
                         Rectangle()
                             .fill(Color.gray.opacity(0.2))
-                            .frame(width: 2, height: 120)
+                            .frame(width: 2, height: 110)
                         
                         MacroElement(
                             _progress: macros["Carbs"]!,
@@ -113,7 +114,7 @@ struct CaloriesMacrosView: View {
                         .overlay(alignment: .bottom){
                             Rectangle()
                                 .fill(Color.gray.opacity(0.2))
-                                .frame(width:120, height: 2)
+                                .frame(width:110, height: 2)
                         }
                         
                        }
@@ -127,7 +128,7 @@ struct CaloriesMacrosView: View {
                         
                         Rectangle()
                             .fill(Color.gray.opacity(0.2))
-                            .frame(width: 2, height: 120)
+                            .frame(width: 2, height: 110)
                         
                         MacroElement(
                             _progress: macros["Fiber"]!,

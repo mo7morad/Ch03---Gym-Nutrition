@@ -62,7 +62,7 @@ struct MacroElement: View {
         }
 //        .padding(.trailing, 10)
         .padding(.top, 15)
-        .padding(.bottom, 40)
+        .padding(.bottom, 30)
     }
 }
 
