@@ -9,13 +9,28 @@ import SwiftUI
 
 struct CaloriesMacrosView: View {
     @State private var isExpanded: Bool = true
+    @State var calories: Int = 1500
+    @State var caloriesTarget: Int = 2550
+    @State var macros: [String: Int] = [
+            "Carbs": 80,
+            "Protein": 80,
+            "Fat": 80,
+            "Fiber": 80
+    ]
+    @State var macrosTarget: [String: Int] = [
+            "Carbs": 200,
+            "Protein": 200,
+            "Fat": 200,
+            "Fiber": 200
+    ]
+    
     var body: some View {
         VStack{
             VStack{
                 
                 // Calories Heading
                 HStack {
-                    Text("760 Calories Left")
+                    Text("\(caloriesTarget - calories) Calories Left")
                         .font(.system(size: 22))
                         .foregroundStyle(Color(hex: "10937E"))
                         .bold()
@@ -35,7 +50,7 @@ struct CaloriesMacrosView: View {
                 
                 // Calories Subheading
                 HStack{
-                    Text("1789 / 2550kcal")
+                    Text("\(calories) / \(caloriesTarget)")
                         .font(.system(size: 12))
                         .opacity(0.5)
                     Spacer()
@@ -45,216 +60,91 @@ struct CaloriesMacrosView: View {
                 // Progress Bar
                 ZStack{
                     Rectangle()
-                        .frame(height: 26)
+                        .frame(height: 25)
                         .foregroundStyle(Color(hex: "D6D6D6"))
                         .cornerRadius(35)
-                    Rectangle()
-                        .frame(height: 17)
-                        .foregroundStyle(Color(hex: "02C2A3"))
-                        .cornerRadius(32)
-                        .padding(.horizontal, 5)
+                    
+                    GeometryReader{ geometry in
+                        let width = geometry.size.width
+                        let progressLeft = (Double(caloriesTarget) - Double(calories))/Double(caloriesTarget)
+                        Rectangle()
+                            .frame(height: 16)
+                            .foregroundStyle(Color(hex: "02C2A3"))
+                            .cornerRadius(32)
+                            .padding(.horizontal, 5)
+                            .offset(x: -CGFloat(progressLeft) * width)
+                    }
+                    .frame(height: 16)
+                    .cornerRadius(32) // what even dude
+                    .padding(.horizontal, 5)
                 }
                 
                 // Macros
             if isExpanded{
-//                        VStack{
-//                            Divider()
-//                            // Top Macro Row
-//                            HStack{
-//                                VStack(alignment: .center){
-//                                    VStack(alignment: .leading){
-//                                        // Protein Macro Main Text
-//                                        VStack(alignment: .leading){
-//                                            Text("28g")
-//                                            Text("Protein Left")
-//                                        }
-//                                            .font(.system(size: 22))
-//                                            .foregroundStyle(Color(hex: "D16D8E"))
-//                                            .bold()
-//
-//                                        // Protein Macro Subheading
-//                                        Text("92 / 120g")
-//
-//                                    }
-//                                    // Progress bar
-//                                    ZStack{
-//                                        Rectangle()
-//                                            .frame(height: 26)
-//                                            .foregroundStyle(Color(hex: "D6D6D6"))
-//                                            .cornerRadius(35)
-//                                        Rectangle()
-//                                            .frame(height: 17)
-//                                            .foregroundStyle(Color(hex: "02C2A3"))
-//                                            .cornerRadius(32)
-//                                            .padding(.horizontal, 5)
-//                                    }
-//                                    .background(Color.red)
-//                                }
-//
-//
-//
-//                                Spacer()
-//                                Divider()
-//                                    .frame(height: 100)
-//                                Spacer()
-//
-//                                VStack(alignment: .leading){
-//                                    Text("28g")
-//                                    Text("Protein Left")
-//                                }
-//                                    .font(.system(size: 22))
-//                                    .foregroundStyle(Color(hex: "D16D8E"))
-//                                    .bold()
-//
-//                            }
-//
-//                            HStack{
-//                                HStack{
-//                                    Text("Protein: 17g")
-//                                        .font(.system(size: 12))
-//                                        .opacity(0.5)
-//                                    Spacer()
-//                                }
-//                                Spacer()
-//                                Divider()
-//                                    .frame(height: 100)
-//                                Spacer()
-//                                HStack{
-//                                    Text("Carbohydrates: 34g")
-//                                        .font(.system(size: 12))
-//                                        .opacity(0.5)
-//                                    Spacer()
-//                                }
-//                            }
-//
-//                        }
-//                        .transition(.move(edge: .top).combined(with: .opacity))
-
-                Grid{
+                Rectangle()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(height: 2)
+                    .padding(.vertical, 10)
+                
+                Grid(){
                     GridRow{
-                        VStack{
-                            // Protein Macro Main Text
-                            VStack(alignment: .leading){
-                                Text("28g")
-                                Text("Protein Left")
-                            }
-                                .font(.system(size: 22))
-                                .foregroundStyle(Color(hex: "D16D8E"))
-                                .bold()
-
-                            // Protein Macro Subheading
-                            Text("92 / 120g")
-                            
-                            // Progress bar
-                            ZStack{
-                                Rectangle()
-                                    .frame(height: 26)
-                                    .foregroundStyle(Color(hex: "D6D6D6"))
-                                    .cornerRadius(35)
-                                Rectangle()
-                                    .frame(height: 17)
-                                    .foregroundStyle(Color(hex: "02C2A3"))
-                                    .cornerRadius(32)
-                                    .padding(.horizontal, 5)
-                            }
-                            .background(Color.red)
-
+                        MacroElement(
+                            _progress: macros["Protein"]!,
+                            _target: macrosTarget["Protein"]!,
+                            _hex_color: "D16D8E",
+                            _macrotype: "Protein")
+                        .padding(.trailing, 10)
+                        .overlay(alignment: .bottom){
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(width:120, height: 2)
                         }
-                        VStack{
-                            // Protein Macro Main Text
-                            VStack(alignment: .leading){
-                                Text("28g")
-                                Text("Protein Left")
-                            }
-                                .font(.system(size: 22))
-                                .foregroundStyle(Color(hex: "D16D8E"))
-                                .bold()
-
-                            // Protein Macro Subheading
-                            Text("92 / 120g")
-                            
-                            // Progress bar
-                            ZStack{
-                                Rectangle()
-                                    .frame(height: 26)
-                                    .foregroundStyle(Color(hex: "D6D6D6"))
-                                    .cornerRadius(35)
-                                Rectangle()
-                                    .frame(height: 17)
-                                    .foregroundStyle(Color(hex: "02C2A3"))
-                                    .cornerRadius(32)
-                                    .padding(.horizontal, 5)
-                            }
-                            .background(Color.red)
-
+                        
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 2, height: 120)
+                        
+                        MacroElement(
+                            _progress: macros["Carbs"]!,
+                            _target: macrosTarget["Carbs"]!,
+                            _hex_color: "D57E3E",
+                            _macrotype: "Carbs")
+                        .padding(.leading, 10)
+                        .overlay(alignment: .bottom){
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(width:120, height: 2)
                         }
-                        }
+                        
+                       }
                     GridRow{
-                        VStack{
-                            // Protein Macro Main Text
-                            VStack(alignment: .leading){
-                                Text("28g")
-                                Text("Protein Left")
-                            }
-                                .font(.system(size: 22))
-                                .foregroundStyle(Color(hex: "D16D8E"))
-                                .bold()
-
-                            // Protein Macro Subheading
-                            Text("92 / 120g")
-                            
-                            // Progress bar
-                            ZStack{
-                                Rectangle()
-                                    .frame(height: 26)
-                                    .foregroundStyle(Color(hex: "D6D6D6"))
-                                    .cornerRadius(35)
-                                Rectangle()
-                                    .frame(height: 17)
-                                    .foregroundStyle(Color(hex: "02C2A3"))
-                                    .cornerRadius(32)
-                                    .padding(.horizontal, 5)
-                            }
-                            .background(Color.red)
-
-                        }
-                        VStack{
-                            // Protein Macro Main Text
-                            VStack(alignment: .leading){
-                                Text("28g")
-                                Text("Protein Left")
-                            }
-                                .font(.system(size: 22))
-                                .foregroundStyle(Color(hex: "D16D8E"))
-                                .bold()
-
-                            // Protein Macro Subheading
-                            Text("92 / 120g")
-                            
-                            // Progress bar
-                            ZStack{
-                                Rectangle()
-                                    .frame(height: 26)
-                                    .foregroundStyle(Color(hex: "D6D6D6"))
-                                    .cornerRadius(35)
-                                Rectangle()
-                                    .frame(height: 17)
-                                    .foregroundStyle(Color(hex: "02C2A3"))
-                                    .cornerRadius(32)
-                                    .padding(.horizontal, 5)
-                            }
-                            .background(Color.red)
-
-                        }
-                        }
-
-
+                        MacroElement(
+                            _progress: macros["Fat"]!,
+                            _target: macrosTarget["Fat"]!,
+                            _hex_color: "7F7BDB",
+                            _macrotype: "Fat")
+                        .padding(.trailing, 10)
+                        
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 2, height: 120)
+                        
+                        MacroElement(
+                            _progress: macros["Fiber"]!,
+                            _target: macrosTarget["Fiber"]!,
+                            _hex_color: "8EA950",
+                            _macrotype: "Fiber")
+                        .padding(.leading, 10)
+                        
+                       }
                     }
+                .transition(.move(edge: .top).combined(with: .scale).combined(with: .opacity))
                 }
             }
         }
         .padding(.horizontal, 24)
-        .padding(.vertical, 26)
+        .padding(.top, 26)
+        .padding(.bottom, isExpanded ? 10 : 26)
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(hex: "E8E8E8"))
