@@ -22,8 +22,7 @@ final class PersistenceController {
         do {
             container = try ModelContainer(for: UserProfile.self)
         } catch {
-            // fatalError is appropriate here: if SwiftData cannot set up the database,
-            // the app has no path forward. This surfaces the issue immediately during development.
+            // fatalError is appropriate here: if SwiftData cannot set up the database (SwiftData).
             fatalError("Failed to create ModelContainer: \(error)")
         }
     }

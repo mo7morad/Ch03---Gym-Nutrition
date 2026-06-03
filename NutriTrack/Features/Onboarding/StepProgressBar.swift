@@ -6,6 +6,7 @@ struct StepProgressBar: View {
 
     private var stepIndex: Int {
         switch currentStep {
+        case .welcome:       return 0  // bar is hidden on welcome; this case is never reached
         case .personalInfo:  return 0
         case .goalSelection: return 1
         case .summary:       return 2
