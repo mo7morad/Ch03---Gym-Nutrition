@@ -149,8 +149,9 @@ struct CaloriesMacrosView: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(hex: "E8E8E8"))
+                .frame(width: 369)
         )
-        .padding(.horizontal, 20) // outer margin from screen edges
+        .padding(.horizontal, 20)
                 
         }
     }

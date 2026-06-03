@@ -4,17 +4,12 @@ struct MealListSectionView: View {
     let dailyMeals: [MealEntry]
     
     var body : some View{
-        NavigationStack{
-            ScrollView{
-                
-                LazyVStack (spacing: 16){
-                    ForEach(dailyMeals) { meal in
-                        MacroSummaryCard(meal: meal)
-                    }
-                }
-                .padding(.vertical)
+        LazyVStack (spacing: 16){
+            ForEach(dailyMeals) { meal in
+                MacroSummaryCard(meal: meal)
             }
         }
+        .padding(.bottom, 30)
     }
 }
 
