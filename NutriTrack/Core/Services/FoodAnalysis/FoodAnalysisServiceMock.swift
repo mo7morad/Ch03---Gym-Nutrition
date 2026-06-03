@@ -1,3 +1,5 @@
+// FILE: NutriTrack/Core/Services/FoodAnalysis/FoodAnalysisServiceMock.swift
+
 import Foundation
 import UIKit
 
@@ -9,7 +11,7 @@ import UIKit
 ///   - Teammates who haven't set up API keys yet
 ///
 /// Returns realistic but hardcoded data. Simulates network delay.
-final class FoodAnalysisServiceMock: FoodAnalysisService {
+final class FoodAnalysisServiceMock: FoodAnalysisService, @unchecked Sendable {
 
     /// If set, the mock throws this error instead of returning data.
     /// Useful for testing error states in your UI.
@@ -19,10 +21,8 @@ final class FoodAnalysisServiceMock: FoodAnalysisService {
     var simulatedDelay: TimeInterval = 1.5
 
     func analyze(image: UIImage) async throws -> [NutritionInfo] {
-        // Simulate network latency
         try await Task.sleep(for: .seconds(simulatedDelay))
 
-        // Support forced error for testing error UI
         if let error = forcedError {
             throw error
         }
@@ -30,84 +30,84 @@ final class FoodAnalysisServiceMock: FoodAnalysisService {
         return Self.sampleMeals.randomElement() ?? Self.chickenAndRice
     }
 
-    // MARK: - Sample Data
+    // MARK: - Sample Data (realistic USDA values scaled to gram weight)
 
     private static let chickenAndRice: [NutritionInfo] = [
         NutritionInfo(
             foodName: "Grilled Chicken Breast",
-            calories: 231,
-            protein: 43.4,
-            carbs: 0,
-            fat: 5.0,
+            calories: 331.2,
+            protein: 62.0,
+            carbs: 0.0,
+            fat: 7.1,
             fiber: 0.0,
-            servingSize: "174g"
+            servingSize: "200g"
         ),
         NutritionInfo(
-            foodName: "Brown Rice (cooked)",
-            calories: 216,
-            protein: 5.0,
-            carbs: 44.8,
+            foodName: "Brown Rice",
+            calories: 221.4,
+            protein: 4.9,
+            carbs: 46.1,
             fat: 1.8,
-            fiber: 3.5,
-            servingSize: "195g (1 cup)"
+            fiber: 2.9,
+            servingSize: "180g"
         )
     ]
 
-    private static let salad: [NutritionInfo] = [
+    private static let salmonSalad: [NutritionInfo] = [
         NutritionInfo(
-            foodName: "Mixed Greens Salad",
-            calories: 15,
-            protein: 1.5,
-            carbs: 2.5,
-            fat: 0.2,
-            fiber: 1.2,
-            servingSize: "85g (2 cups)"
+            foodName: "Salmon Fillet",
+            calories: 312.0,
+            protein: 33.6,
+            carbs: 0.0,
+            fat: 18.3,
+            fiber: 0.0,
+            servingSize: "150g"
         ),
         NutritionInfo(
-            foodName: "Grilled Salmon",
-            calories: 233,
-            protein: 32.0,
-            carbs: 0,
-            fat: 11.2,
-            fiber: 0.0,
-            servingSize: "140g"
+            foodName: "Mixed Greens Salad",
+            calories: 20.7,
+            protein: 1.6,
+            carbs: 3.2,
+            fat: 0.3,
+            fiber: 1.8,
+            servingSize: "90g"
         ),
         NutritionInfo(
             foodName: "Olive Oil Dressing",
-            calories: 120,
-            protein: 0,
-            carbs: 0,
-            fat: 14.0,
+            calories: 132.6,
+            protein: 0.0,
+            carbs: 0.0,
+            fat: 15.0,
             fiber: 0.0,
-            servingSize: "1 tbsp"
+            servingSize: "15g"
         )
     ]
 
-    private static let breakfast: [NutritionInfo] = [
+    private static let scrambledEggs: [NutritionInfo] = [
         NutritionInfo(
             foodName: "Scrambled Eggs",
-            calories: 182,
-            protein: 12.4,
-            carbs: 1.6,
-            fat: 14.0,
+            calories: 178.8,
+            protein: 13.2,
+            carbs: 1.9,
+            fat: 13.2,
             fiber: 0.0,
-            servingSize: "2 large eggs"
+            servingSize: "120g"
         ),
         NutritionInfo(
             foodName: "Whole Wheat Toast",
-            calories: 128,
-            protein: 6.0,
-            carbs: 24.0,
-            fat: 2.0,
-            fiber: 3.0,
-            servingSize: "2 slices"
+            calories: 158.4,
+            protein: 7.1,
+            carbs: 28.7,
+            fat: 2.1,
+            fiber: 4.2,
+            servingSize: "60g"
         )
     ]
 
     private static let sampleMeals: [[NutritionInfo]] = [
         chickenAndRice,
-        salad,
-        breakfast
+        salmonSalad,
+        scrambledEggs
     ]
 }
 

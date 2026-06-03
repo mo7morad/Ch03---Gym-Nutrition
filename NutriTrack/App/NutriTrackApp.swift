@@ -1,3 +1,5 @@
+// FILE: NutriTrack/App/NutriTrackApp.swift
+
 import SwiftUI
 import SwiftData
 

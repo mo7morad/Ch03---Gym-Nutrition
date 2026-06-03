@@ -32,9 +32,9 @@ final class MealLogViewModel {
 
         Task {
             do {
-                let items = try await analysisService.analyze(image: image)
-                // The whole class is @MainActor — no MainActor.run needed.
-                step = .result(items)
+                let nutritionInfos = try await analysisService.analyze(image: image)
+                let foodItems = nutritionInfos.map { FoodItem(id: UUID(), name: $0.foodName, nutrition: $0) }
+                step = .result(foodItems)
             } catch {
                 // On error, return to camera so the user can try again.
                 step = .capturing
