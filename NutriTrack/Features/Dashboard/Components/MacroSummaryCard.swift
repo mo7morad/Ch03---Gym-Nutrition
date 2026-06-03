@@ -4,37 +4,108 @@
 import SwiftUI
 
 struct MacroSummaryCard: View{
-    let food: FoodItem
+    let meal: MealEntry
+    
+    private var itemsSummary: String {
+        let names = meal.items.map { $0.name }
+        return names.isEmpty ? "No items logged" : names.joined(separator: ", ")
+    }
+        
+    private var timeString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: meal.timestamp)
+    }
+    
+    private var mealTitle: String {
+        let hour = Calendar.current.component(.hour, from: meal.timestamp)
+        switch hour {
+        case 5..<11: return "Breakfast"
+        case 11..<15: return "Lunch"
+        case 15..<18: return "Snack"
+        default: return "Dinner"
+        }
+    }
     
     var body : some View{
-        ZStack{
-            RoundedRectangle(cornerRadius: 35)
-                .fill(Color("foodCard"))
-            ZStack(alignment: .center){
-                Image("pan-break")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 116, height: 156
-                    )
-                    .cornerRadius(58)
-                
-                VStack(spacing:2){
-                    Text(food.name)
-                        .font(.system(size: 18))
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color(.white))
-                    
-                    Text("\(food.nutrition.calories, specifier: "%.0f") kcal")
-                        .font(.system(size: 15))
-                        .fontWeight(.light)
-                        .foregroundStyle(Color(.white))
-                }
-                
-                
-                
-            }
+        
+      ZStack{
+            RoundedRectangle(cornerRadius: 12)
+              .foregroundStyle(Color(.systemGray6))
+              .frame(width: 369, height: 129)
+          
+          VStack (alignment: .leading, spacing: 9){
+              
+              HStack{
+                  Text(mealTitle)  //link the data
+                      .fontWeight(.semibold)
+                      .font(.system(size: 22))
+                  
+                  Spacer()
+                  
+                  Button{}label: {
+                      Image(systemName: "chevron.right.circle.fill")
+                          .resizable()
+                          .frame(width: 22, height: 22)
+                          .foregroundStyle(Color(hex: "181818"))
+                          .opacity(0.4)
+                  }
+                  
+              }
+              
+                  
+              
+              Text(itemsSummary)  //link the data
+                  .fontWeight(.regular)
+                  .font(.system(size: 12))
+                  .foregroundStyle(Color(hex: "181818"))
+                  .opacity(0.5)
+              
+              
+              Divider()
+            
+              HStack{
+                HStack(spacing: 3){
+                      Image(systemName: "flame")
+                          .resizable()
+                          .scaledToFill()
+                          .frame(width: 11, height: 11)
+                      
+                      Text(String(format: "%.0f kcal", meal.totalNutrition.calories)) //link the data
+                          .font(.system(size: 11))
+                  }
+                .fontWeight(.semibold)
+                .padding(.trailing, 15)
+                .foregroundStyle(Color(hex: "10937E"))
+                  
+                  HStack(spacing: 3){
+                      Image(systemName: "p.circle")
+                          .resizable()
+                          .scaledToFill()
+                          .frame(width: 12, height: 12)
+                          
+                      
+                      Text(String(format: "%.0fg", meal.totalNutrition.proteinGrams))
+                          .font(.system(size: 11))
+                          .font(.system(size: 11))
+                  }
+                  .foregroundStyle(Color(hex: "D16D8E"))
+                  .fontWeight(.semibold)
+                  
+                  
+                  Spacer()
+                  
+                  Text("09.25") //link the data
+                      .font(Font.system(size: 11))
+                      .foregroundStyle(Color(hex: "181818"))
+                      .opacity(0.5)
+              }
+              
+          }
+          .padding(.vertical, 21)
+          .padding(.horizontal, 36)
+          
         }
-        .frame(width: 172, height: 211)
     }
 }
 
@@ -42,17 +113,11 @@ struct MacroSummaryCard: View{
 
 
 #Preview {
-    MacroSummaryCard(
-        food: FoodItem(
-            id: UUID(),
-            name: "Breakie",
-            nutrition: NutritionInfo(
-                calories: 100,
-                proteinGrams: 80,
-                carbsGrams: 50,
-                fibreGrams: 100,
-                fatGrams: 10
-            )
-        )
-    )
+    // Updated to match your exact FoodItem struct requirement (adding id: UUID())
+    let mockItem1 = FoodItem(id: UUID(), name: "Fried Rice", nutrition: NutritionInfo(calories: 350, proteinGrams: 10, carbsGrams: 45, fibreGrams: 3, fatGrams: 12))
+    let mockItem2 = FoodItem(id: UUID(), name: "Boiled Egg", nutrition: NutritionInfo(calories: 70, proteinGrams: 6, carbsGrams: 0, fibreGrams: 0, fatGrams: 5))
+    
+    let mockMeal = MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: [mockItem1, mockItem2])
+    
+    MacroSummaryCard(meal: mockMeal)
 }
