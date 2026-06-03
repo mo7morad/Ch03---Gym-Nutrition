@@ -31,3 +31,38 @@ struct MacroRow: View {
         )
     }
 }
+
+
+#Preview("Macro Rows") {
+    VStack(spacing: 12) {
+        MacroRow(
+            label: "Protein",
+            value: 150,
+            unit: "g",
+            color: .red
+        )
+
+        MacroRow(
+            label: "Carbs",
+            value: 220,
+            unit: "g",
+            color: .blue
+        )
+
+        MacroRow(
+            label: "Fat",
+            value: 70,
+            unit: "g",
+            color: .orange
+        )
+
+        MacroRow(
+            label: "Fibre",
+            value: 30,
+            unit: "g",
+            color: .green
+        )
+    }
+    .padding()
+    .background(Color(.systemGroupedBackground))
+}

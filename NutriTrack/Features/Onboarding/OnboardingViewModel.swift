@@ -15,14 +15,15 @@ final class OnboardingViewModel {
     // Using an enum (not a simple Int) means the compiler enforces that you handle
     // every case — you can't accidentally end up in an undefined step.
     enum Step {
-        case personalInfo
-        case goalSelection
-        case summary
+        case welcome        // Step 0 — mascot intro, no data collected
+        case personalInfo   // Step 1
+        case goalSelection  // Step 2
+        case summary        // Step 3
     }
 
     // MARK: - Step state
 
-    var currentStep: Step = .personalInfo
+    var currentStep: Step = .welcome
 
     // Set to true after the profile is saved. OnboardingView observes this
     // to know when to dismiss itself and show the Dashboard.
@@ -60,11 +61,10 @@ final class OnboardingViewModel {
 
     func advance() {
         switch currentStep {
-        case .personalInfo:
-            currentStep = .goalSelection
-        case .goalSelection:
-            currentStep = .summary
-        case .summary:       break  // completion is handled by complete(), not advance()
+        case .welcome:       currentStep = .personalInfo
+        case .personalInfo:  currentStep = .goalSelection
+        case .goalSelection: currentStep = .summary
+        case .summary:       break
         }
     }
 
@@ -93,8 +93,6 @@ final class OnboardingViewModel {
         do {
             try context.save()
         } catch {
-            // In a production app you'd surface this error to the user.
-            // For now, log it and bail out without setting isComplete.
             print("Failed to save UserProfile: \(error)")
             return
         }

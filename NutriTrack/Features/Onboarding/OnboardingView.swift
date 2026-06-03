@@ -18,17 +18,22 @@ struct OnboardingView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Step progress indicator
-                StepProgressBar(currentStep: viewModel.currentStep)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 12)
-                    .padding(.bottom, 4)
+                // Progress bar is hidden on the welcome screen — it only appears
+                // once the user starts providing data (step 1 onward).
+                if viewModel.currentStep != .welcome {
+                    StepProgressBar(currentStep: viewModel.currentStep)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 12)
+                        .padding(.bottom, 4)
+                }
 
-                // Conditional rendering on the step enum.
-                // This is the idiomatic SwiftUI way to show/hide views based on state —
-                // no NavigationLink, no sheet, just a switch.
                 Group {
                     switch viewModel.currentStep {
+                    case .welcome:
+                        // No slide transition on welcome — it fades in as the first screen.
+                        WelcomeStepView(viewModel: viewModel)
+                            .transition(.opacity)
+
                     case .personalInfo:
                         PersonalInfoStepView(viewModel: viewModel)
                             .transition(.asymmetric(
@@ -51,11 +56,12 @@ struct OnboardingView: View {
                             ))
                     }
                 }
-                // animation(_:value:) animates the view swap whenever currentStep changes.
                 .animation(.easeInOut(duration: 0.3), value: viewModel.currentStep)
             }
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
+            // Hide the nav bar on welcome for a full-bleed, immersive first impression.
+            .toolbar(viewModel.currentStep == .welcome ? .hidden : .visible, for: .navigationBar)
         }
         // onChange watches isComplete and calls onComplete() as soon as the ViewModel
         // finishes saving. The parent then swaps the root view to Dashboard.
@@ -66,6 +72,7 @@ struct OnboardingView: View {
 
     private var navigationTitle: String {
         switch viewModel.currentStep {
+        case .welcome:       return ""
         case .personalInfo:  return "About You"
         case .goalSelection: return "Your Goal"
         case .summary:       return "Your Plan"

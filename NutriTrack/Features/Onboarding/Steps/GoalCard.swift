@@ -47,3 +47,36 @@ struct GoalCard: View {
         .buttonStyle(.plain)
     }
 }
+
+#Preview("Goal Selection") {
+    VStack(spacing: 16) {
+        GoalCard(
+            title: "Lose Weight",
+            subtitle: "Create a calorie deficit for fat loss",
+            systemImage: "flame.fill",
+            color: .orange,
+            isSelected: true,
+            action: {}
+        )
+
+        GoalCard(
+            title: "Maintain Weight",
+            subtitle: "Stay at your current weight",
+            systemImage: "equal.circle.fill",
+            color: .blue,
+            isSelected: false,
+            action: {}
+        )
+
+        GoalCard(
+            title: "Gain Muscle",
+            subtitle: "Increase calories for muscle growth",
+            systemImage: "dumbbell.fill",
+            color: .green,
+            isSelected: false,
+            action: {}
+        )
+    }
+    .padding()
+    .background(Color(.systemGroupedBackground))
+}
