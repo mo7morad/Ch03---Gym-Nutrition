@@ -3,3 +3,6 @@ DerivedData/
 build/
 *.xcuserstate
 **/xcuserdata/
+
+# Secrets — never commit real API keys
+NutriTrack/Resources/Secrets.plist
