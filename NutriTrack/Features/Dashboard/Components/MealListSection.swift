@@ -4,6 +4,17 @@ struct MealListSectionView: View {
     let dailyMeals: [MealEntry]
     
     var body : some View{
+        
+        // Heading
+        HStack{
+            Text("Today's Meal")
+                .font(.system(size: 28, weight: .bold))
+                .padding(.leading, 15)
+                .padding(.top, 20)
+            Spacer()
+        }
+        
+        // Content List
         LazyVStack (spacing: 16){
             ForEach(dailyMeals) { meal in
                 MacroSummaryCard(meal: meal)
