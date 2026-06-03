@@ -5,13 +5,6 @@ import UIKit
 
 // MARK: - Live Implementation
 
-/// The real implementation of `FoodAnalysisService`.
-/// Orchestrates the two-step pipeline:
-///   1. Gemini Vision → identify foods + gram weights
-///   2. USDA FoodData Central → look up macros scaled by weight
-///
-/// This type is never imported by Views or ViewModels directly.
-/// Inject it via the `FoodAnalysisService` protocol.
 final class FoodAnalysisServiceLive: FoodAnalysisService, @unchecked Sendable {
 
     private let visionClient: GeminiVisionClient
@@ -37,21 +30,32 @@ final class FoodAnalysisServiceLive: FoodAnalysisService, @unchecked Sendable {
 // MARK: - Factory
 
 extension FoodAnalysisServiceLive {
-    /// Convenience factory using placeholder API keys.
-    /// Call this once at app startup and inject the result everywhere.
-    ///
-    /// Usage in NutriTrackApp.swift:
-    /// ```swift
-    /// let foodService = FoodAnalysisServiceLive.makeDefault()
-    /// ```
     static func makeDefault() -> FoodAnalysisServiceLive {
-        // TODO: Load from config, never commit real keys to source control
-        let geminiAPIKey = "YOUR_GEMINI_API_KEY"
-        let usdaAPIKey = "YOUR_USDA_API_KEY"
+        let geminiAPIKey = loadSecret("GEMINI_API_KEY", placeholder: "YOUR_GEMINI_API_KEY")
+        let usdaAPIKey = loadSecret("USDA_API_KEY", placeholder: "YOUR_USDA_API_KEY")
 
         return FoodAnalysisServiceLive(
             visionClient: GeminiVisionClient(apiKey: geminiAPIKey),
             nutritionClient: USDANutritionClient(apiKey: usdaAPIKey)
         )
+    }
+
+    /// Loads a secret from `Secrets.plist` in the app bundle.
+    /// Falls back to the placeholder if the plist is missing or the value is unset.
+    ///
+    /// Setup:
+    /// 1. Copy `Resources/Secrets.template.plist` → `Resources/Secrets.plist`
+    /// 2. Replace placeholder values with real API keys
+    /// 3. `Secrets.plist` is gitignored — never commit real keys
+    private static func loadSecret(_ key: String, placeholder: String) -> String {
+        guard let url = Bundle.main.url(forResource: "Secrets", withExtension: "plist"),
+              let dict = NSDictionary(contentsOf: url) as? [String: String],
+              let value = dict[key],
+              !value.isEmpty,
+              value != placeholder
+        else {
+            return placeholder
+        }
+        return value
     }
 }
