@@ -31,7 +31,7 @@ struct MacroSummaryCard: View{
         
       ZStack{
             RoundedRectangle(cornerRadius: 12)
-              .foregroundStyle(Color(.systemGray6))
+              .foregroundStyle(Color(hex: "E8E8E8"))
               .frame(width: 369, height: 129)
           
           VStack (alignment: .leading, spacing: 9){
