@@ -8,7 +8,6 @@ struct MealLogView: View {
     var startsWithCamera: Bool = false
 
     @Environment(\.foodAnalysisService) private var foodAnalysisService
-    @Environment(\.mealPhotoStorage) private var mealPhotoStorage
     @State private var viewModel: MealLogViewModel?
     @State private var showCamera = false
     @State private var selectedItem: PhotosPickerItem?
@@ -22,14 +21,8 @@ struct MealLogView: View {
         .animation(.easeInOut(duration: 0.25), value: viewModel?.step.id)
         .task {
             if viewModel == nil {
-                viewModel = MealLogViewModel(
-                    analysisService: foodAnalysisService,
-                    photoStorage: mealPhotoStorage
-                )
+                viewModel = MealLogViewModel(analysisService: foodAnalysisService)
             }
-        }
-        .onDisappear {
-            viewModel?.cleanupUncommittedPhoto()
         }
     }
 
@@ -140,7 +133,7 @@ struct MealLogView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        cancelFlow(using: viewModel)
+                        onCancel()
                     } label: {
                         Label("Close", systemImage: "xmark")
                     }
@@ -226,9 +219,9 @@ struct MealLogView: View {
                 .background(.ultraThinMaterial, in: Capsule())
 
                 Button {
-                    cancelFlow(using: viewModel)
+                    viewModel.retake()
                 } label: {
-                    Text("Cancel")
+                    Text("Retake Photo")
                         .fontWeight(.semibold)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 10)
@@ -260,7 +253,5 @@ struct MealLogView: View {
             onComplete: { _ in showMealLog = false },
             onCancel: { showMealLog = false }
         )
-        .environment(\.foodAnalysisService, FoodAnalysisServiceMock())
-        .environment(\.mealPhotoStorage, ImageProcessingService())
     }
 }

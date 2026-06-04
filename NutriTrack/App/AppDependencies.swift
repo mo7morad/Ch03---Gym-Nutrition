@@ -4,15 +4,12 @@ import Foundation
 
 struct AppDependencies {
     let foodAnalysisService: any FoodAnalysisService
-    let mealPhotoStorage: any MealPhotoStorage
 
     static let live = AppDependencies(
-        foodAnalysisService: FoodAnalysisServiceLive.makeDefault(),
-        mealPhotoStorage: ImageProcessingService()
+        foodAnalysisService: FoodAnalysisServiceLive.makeDefault()
     )
 
     static let mock = AppDependencies(
-        foodAnalysisService: FoodAnalysisServiceMock(),
-        mealPhotoStorage: ImageProcessingService()
+        foodAnalysisService: FoodAnalysisServiceMock()
     )
 }

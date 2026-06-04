@@ -166,17 +166,6 @@ struct DashboardView: View {
             }
             .background(Color(hex: "F3F3F3"))
         }
-        .fullScreenCover(isPresented: $viewModel.isPresentingMealLog) {
-            MealLogView(
-                onComplete: { meal in
-                    viewModel.addMeal(meal)
-                    viewModel.dismissMealLog()
-                },
-                onCancel: {
-                    viewModel.dismissMealLog()
-                }
-            )
-        }
     }
 }
 

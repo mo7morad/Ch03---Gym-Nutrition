@@ -4,12 +4,10 @@ struct MealPhotoThumbnail: View {
     let photoRef: String?
     var size: CGFloat = 72
 
-    @Environment(\.mealPhotoStorage) private var photoStorage
-
     var body: some View {
         Group {
             if let photoRef,
-               let image = photoStorage.loadMealPhoto(from: photoRef) {
+               let image = ImageProcessingService.loadMealPhoto(from: photoRef) {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
