@@ -71,9 +71,7 @@ private struct GeminiResponse: Decodable {
 // MARK: - Client
 
 /// Sends an image to Gemini Flash and returns identified food items with gram weights.
-/// Pure networking — no SwiftUI, no SwiftData.
 struct GeminiVisionClient: Sendable {
-    // TODO: Move to secure backend proxy before any external release
     private let apiKey: String
     private let session: URLSession
 
@@ -82,9 +80,6 @@ struct GeminiVisionClient: Sendable {
         self.session = session
     }
 
-    /// Identifies foods in the image with estimated gram weights.
-    /// - Returns: Array of identified foods with names and gram weights.
-    /// - Throws: `GeminiVisionError` on network or parsing failure.
     func identify(image: UIImage) async throws -> [GeminiIdentifiedFood] {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             throw GeminiVisionError.imageEncodingFailed
@@ -109,7 +104,8 @@ struct GeminiVisionClient: Sendable {
             throw GeminiVisionError.httpError(statusCode: httpResponse.statusCode)
         }
 
-        return try parseResponse(data: data)
+        let items = try parseResponse(data: data)
+        return normalizeForUSDA(items)
     }
 
     // MARK: - Private Helpers
@@ -129,19 +125,24 @@ struct GeminiVisionClient: Sendable {
 
     private func buildRequest(base64Image: String) -> GeminiRequest {
         let prompt = """
-        Identify every distinct food item visible in the image. \
-        Estimate the weight of each item IN GRAMS (not portions, not cups — grams only). \
-        Account for cooking method when estimating density. \
-        Return ONLY a JSON object, no markdown, no explanation, no code fences.
+        Identify distinct foods in this meal photo for the USDA FoodData Central API \
+        (Foundation Foods and SR Legacy datasets only — not branded packaged products).
 
-        {
-          "items": [
-            {
-              "name": "descriptive food name including preparation method, e.g. 'grilled chicken breast'",
-              "estimatedWeightGrams": 200
-            }
-          ]
-        }
+        Output rules for "name" (this string is sent verbatim as the USDA search query):
+        - Use short generic English in SR Legacy style: "food, detail, preparation".
+        - Examples: "rice, brown, cooked", "chicken, breast, grilled", "broccoli, cooked", "egg, whole, cooked".
+        - Do NOT use brand names, restaurant names, menu titles, or compound dish names \
+        (avoid "caesar salad", "chicken sandwich", "pasta carbonara").
+        - Decompose plates into separate simple ingredients when visible.
+        - Lowercase only. Use commas between descriptors. No other punctuation.
+        - Maximum 8 words per name. Letters, commas, and spaces only.
+        - Prefer the most common USDA commodity term when unsure.
+
+        Rules for "estimatedWeightGrams":
+        - Integer grams of edible portion visible (not cups, slices, or servings). Range 5–2000.
+
+        Return at most 8 items. Return ONLY valid JSON, no markdown:
+        {"items":[{"name":"chicken, breast, grilled","estimatedWeightGrams":150}]}
         """
 
         return GeminiRequest(
@@ -181,6 +182,18 @@ struct GeminiVisionClient: Sendable {
         }
 
         return foodList.items
+    }
+
+    /// Applies USDA query sanitization and safe gram bounds before network lookup.
+    private func normalizeForUSDA(_ items: [GeminiIdentifiedFood]) -> [GeminiIdentifiedFood] {
+        items.compactMap { item in
+            let query = USDAQuerySanitizer.sanitize(item.name)
+            guard !query.isEmpty else { return nil }
+            return GeminiIdentifiedFood(
+                name: query,
+                estimatedWeightGrams: USDAQuerySanitizer.clampWeight(item.estimatedWeightGrams)
+            )
+        }
     }
 }
 

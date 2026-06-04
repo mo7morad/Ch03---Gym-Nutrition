@@ -95,7 +95,7 @@ struct MacroSummaryCard: View{
                   
                   Spacer()
                   
-                  Text("09.25") //link the data
+                  Text(timeString)
                       .font(Font.system(size: 11))
                       .foregroundStyle(Color(hex: "181818"))
                       .opacity(0.5)

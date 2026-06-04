@@ -3,7 +3,7 @@ import PhotosUI
 
 struct MealLogView: View {
 
-    let onComplete: () -> Void
+    let onComplete: (MealEntry) -> Void
     let onCancel: () -> Void
     var startsWithCamera: Bool = false
 
@@ -46,8 +46,9 @@ struct MealLogView: View {
             PhotoResultSummary(
                 meal: viewModel.makeMealEntry(items: items),
                 onDone: {
-                    viewModel.logMeal()
-                    onComplete()
+                    let meal = viewModel.makeMealEntry(items: items)
+                    viewModel.logMeal(meal)
+                    onComplete(meal)
                 },
                 onDismiss: {
                     viewModel.retake()
@@ -249,8 +250,8 @@ struct MealLogView: View {
     }
     .fullScreenCover(isPresented: $showMealLog) {
         MealLogView(
-            onComplete: { showMealLog = false },
-            onCancel:   { showMealLog = false }
+            onComplete: { _ in showMealLog = false },
+            onCancel: { showMealLog = false }
         )
     }
 }

@@ -1,50 +1,33 @@
 import SwiftUI
+import SwiftData
 
 struct DashboardView: View {
+    @Query private var profiles: [UserProfile]
+
     @State private var toggleStreak: Bool = true
     @State private var showMealLog = false
+    @State private var dailyMeals: [MealEntry] = []
 
-    let mockMeal1 = MealEntry(
-        id: UUID(),
-        timestamp: Date(),
-        photoRef: nil,
-        items: [
-            FoodItem(
-                id: UUID(),
-                name: "Fried Rice",
-                nutrition: NutritionInfo(
-                    foodName: "Fried Rice",
-                    calories: 90,
-                    protein: 10,
-                    carbs: 4,
-                    fat: 2,
-                    fiber: 4,
-                    servingSize: "large"
-                )
+    private var nutritionGoal: NutritionGoal {
+        guard let profile = profiles.first else {
+            return NutritionGoal(
+                dailyCalories: 2550,
+                proteinGrams: 191,
+                carbsGrams: 255,
+                fibreGrams: 36,
+                fatGrams: 85
             )
-        ]
-    )
+        }
+        return NutritionCalculator.calculate(for: profile)
+    }
 
-    let mockMeal2 = MealEntry(
-        id: UUID(),
-        timestamp: Date(),
-        photoRef: nil,
-        items: [
-            FoodItem(
-                id: UUID(),
-                name: "Eggs",
-                nutrition: NutritionInfo(
-                    foodName: "Eggs",
-                    calories: 90,
-                    protein: 10,
-                    carbs: 4,
-                    fat: 2,
-                    fiber: 4,
-                    servingSize: "large"
-                )
-            )
-        ]
-    )
+    private var todaysMeals: [MealEntry] {
+        dailyMeals.meals(on: .now)
+    }
+
+    private var consumedToday: NutritionInfo {
+        todaysMeals.totalNutrition
+    }
 
     var body: some View {
         NavigationStack {
@@ -55,9 +38,24 @@ struct DashboardView: View {
                         .frame(width: 220, height: 150)
                         .padding(.top, 40)
 
-                    CaloriesMacrosView()
+                    CaloriesMacrosView(
+                        calories: Int(consumedToday.calories.rounded()),
+                        caloriesTarget: Int(nutritionGoal.dailyCalories.rounded()),
+                        macros: [
+                            "Protein": Int(consumedToday.protein.rounded()),
+                            "Carbs": Int(consumedToday.carbs.rounded()),
+                            "Fat": Int(consumedToday.fat.rounded()),
+                            "Fiber": Int(consumedToday.fiber.rounded())
+                        ],
+                        macrosTarget: [
+                            "Protein": Int(nutritionGoal.proteinGrams.rounded()),
+                            "Carbs": Int(nutritionGoal.carbsGrams.rounded()),
+                            "Fat": Int(nutritionGoal.fatGrams.rounded()),
+                            "Fiber": Int(nutritionGoal.fibreGrams.rounded())
+                        ]
+                    )
 
-                    MealListSectionView(dailyMeals: [mockMeal1, mockMeal2])
+                    MealListSectionView(dailyMeals: todaysMeals)
                 }
             }
             .toolbar {
@@ -159,7 +157,10 @@ struct DashboardView: View {
             }
             .fullScreenCover(isPresented: $showMealLog) {
                 MealLogView(
-                    onComplete: { showMealLog = false },
+                    onComplete: { meal in
+                        dailyMeals.insert(meal, at: 0)
+                        showMealLog = false
+                    },
                     onCancel: { showMealLog = false },
                     startsWithCamera: true
                 )
@@ -171,4 +172,5 @@ struct DashboardView: View {
 
 #Preview {
     DashboardView()
+        .modelContainer(PersistenceController.shared.container)
 }
