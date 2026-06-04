@@ -3,32 +3,24 @@
 
 import SwiftUI
 
-struct MacroSummaryCard: View{
+struct MacroSummaryCard: View {
     let meal: MealEntry
-    
+    var onSelect: () -> Void = {}
+
     private var itemsSummary: String {
-        let names = meal.items.map { $0.name }
-        return names.isEmpty ? "No items logged" : names.joined(separator: ", ")
+        let names = meal.itemDisplayNames
+        guard !names.isEmpty else { return "No items logged" }
+        return names.formatted(.list(type: .and, width: .short))
     }
-        
+
     private var timeString: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: meal.timestamp)
     }
-    
-    private var mealTitle: String {
-        let hour = Calendar.current.component(.hour, from: meal.timestamp)
-        switch hour {
-        case 5..<11: return "Breakfast"
-        case 11..<15: return "Lunch"
-        case 15..<18: return "Snack"
-        default: return "Dinner"
-        }
-    }
-    
-    var body : some View{
-        
+
+    var body: some View {
+      Button(action: onSelect) {
       ZStack{
             RoundedRectangle(cornerRadius: 12)
               .foregroundStyle(Color(hex: "E8E8E8"))
@@ -37,20 +29,17 @@ struct MacroSummaryCard: View{
           VStack (alignment: .leading, spacing: 9){
               
               HStack{
-                  Text(mealTitle)  //link the data
+                  Text(meal.mealPeriodTitle)
                       .fontWeight(.semibold)
                       .font(.system(size: 22))
-                  
+
                   Spacer()
-                  
-                  Button{}label: {
-                      Image(systemName: "chevron.right.circle.fill")
-                          .resizable()
-                          .frame(width: 22, height: 22)
-                          .foregroundStyle(Color(hex: "181818"))
-                          .opacity(0.4)
-                  }
-                  
+
+                  Image(systemName: "chevron.right.circle.fill")
+                      .resizable()
+                      .frame(width: 22, height: 22)
+                      .foregroundStyle(Color(hex: "181818"))
+                      .opacity(0.4)
               }
               
                   
@@ -110,6 +99,8 @@ struct MacroSummaryCard: View{
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(hex: "E8E8E8"), in: RoundedRectangle(cornerRadius: 12))
+      }
+      .buttonStyle(.plain)
     }
 }
 

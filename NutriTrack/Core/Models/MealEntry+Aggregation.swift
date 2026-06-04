@@ -1,5 +1,36 @@
 import Foundation
 
+extension MealEntry {
+    /// Meal slot label from log time (Breakfast, Lunch, Snack, Dinner).
+    var mealPeriodTitle: String {
+        let hour = Calendar.current.component(.hour, from: timestamp)
+        switch hour {
+        case 5..<11: return "Breakfast"
+        case 11..<15: return "Lunch"
+        case 15..<18: return "Snack"
+        default: return "Dinner"
+        }
+    }
+
+    var itemDisplayNames: [String] {
+        items.map { USDAQuerySanitizer.displayName(from: $0.name) }
+    }
+
+    /// Primary headline on the meal detail screen.
+    var mealHeadline: String {
+        let names = itemDisplayNames
+        guard !names.isEmpty else { return "Unknown Meal" }
+        return names.joined(separator: " ")
+    }
+
+    /// Comma-separated ingredient list for the detail screen.
+    var ingredientsLabel: String {
+        let names = itemDisplayNames
+        guard !names.isEmpty else { return "No ingredients" }
+        return names.joined(separator: ", ")
+    }
+}
+
 extension Array where Element == MealEntry {
 
     var totalNutrition: NutritionInfo {

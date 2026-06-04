@@ -5,8 +5,15 @@ struct DashboardView: View {
     @Query private var profiles: [UserProfile]
 
     @State private var toggleStreak: Bool = true
-    @State private var showMealLog = false
+    @State private var mealLogPresentation: MealLogPresentation?
     @State private var dailyMeals: [MealEntry] = []
+
+    private enum MealLogPresentation: Identifiable {
+        case camera
+        case gallery
+
+        var id: Self { self }
+    }
 
     private var nutritionGoal: NutritionGoal {
         guard let profile = profiles.first else {
@@ -81,7 +88,9 @@ struct DashboardView: View {
                     Spacer()
 
                     Menu {
-                        Button {} label: {
+                        Button {
+                            mealLogPresentation = .gallery
+                        } label: {
                             HStack {
                                 Image(systemName: "photo.fill.on.rectangle.fill")
                                 Text("Choose Photo")
@@ -89,7 +98,7 @@ struct DashboardView: View {
                         }
 
                         Button {
-                            showMealLog = true
+                            mealLogPresentation = .camera
                         } label: {
                             HStack {
                                 Image(systemName: "camera.fill")
@@ -154,14 +163,15 @@ struct DashboardView: View {
                     )
                 }
             }
-            .fullScreenCover(isPresented: $showMealLog) {
+            .fullScreenCover(item: $mealLogPresentation) { presentation in
                 MealLogView(
                     onComplete: { meal in
                         dailyMeals.insert(meal, at: 0)
-                        showMealLog = false
+                        mealLogPresentation = nil
                     },
-                    onCancel: { showMealLog = false },
-                    startsWithCamera: true
+                    onCancel: { mealLogPresentation = nil },
+                    startsWithCamera: presentation == .camera,
+                    startsWithGallery: presentation == .gallery
                 )
             }
             .background(Color(hex: "F3F3F3"))

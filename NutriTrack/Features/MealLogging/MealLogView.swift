@@ -6,10 +6,12 @@ struct MealLogView: View {
     let onComplete: (MealEntry) -> Void
     let onCancel: () -> Void
     var startsWithCamera: Bool = false
+    var startsWithGallery: Bool = false
 
     @Environment(\.foodAnalysisService) private var foodAnalysisService
     @State private var viewModel: MealLogViewModel?
     @State private var showCamera = false
+    @State private var showGalleryPicker = false
     @State private var selectedItem: PhotosPickerItem?
 
     var body: some View {
@@ -35,6 +37,8 @@ struct MealLogView: View {
         case .capturing:
             if startsWithCamera {
                 cameraCaptureScreen(viewModel: viewModel)
+            } else if startsWithGallery {
+                galleryPickScreen(viewModel: viewModel)
             } else {
                 choiceScreen(viewModel: viewModel)
             }
@@ -45,6 +49,7 @@ struct MealLogView: View {
         case .result(let items):
             PhotoResultSummary(
                 meal: viewModel.makeMealEntry(items: items),
+                context: .newMeal,
                 onDone: {
                     let meal = viewModel.makeMealEntry(items: items)
                     viewModel.logMeal(meal)
@@ -72,6 +77,25 @@ struct MealLogView: View {
             onCancel: onCancel
         )
         .ignoresSafeArea()
+    }
+
+    // MARK: - Gallery-only entry (dashboard "Choose Photo")
+
+    @ViewBuilder
+    private func galleryPickScreen(viewModel: MealLogViewModel) -> some View {
+        Color(.systemGroupedBackground)
+            .ignoresSafeArea()
+            .photosPicker(isPresented: $showGalleryPicker, selection: $selectedItem, matching: .images)
+            .onAppear {
+                showGalleryPicker = true
+            }
+            .onChange(of: showGalleryPicker) { _, isPresented in
+                guard !isPresented, selectedItem == nil else { return }
+                onCancel()
+            }
+            .onChange(of: selectedItem) { _, newValue in
+                handleSelectedPhoto(newValue, viewModel: viewModel)
+            }
     }
 
     // MARK: - Choice Screen
@@ -140,16 +164,8 @@ struct MealLogView: View {
                 }
             }
         }
-        .onChange(of: selectedItem) { oldValue, newValue in
-            guard let item = newValue else { return }
-            Task {
-                if let data = try? await item.loadTransferable(type: Data.self),
-                   let image = UIImage(data: data) {
-                    viewModel.usePhoto(image)
-                } else {
-                    viewModel.retake()
-                }
-            }
+        .onChange(of: selectedItem) { _, newValue in
+            handleSelectedPhoto(newValue, viewModel: viewModel)
         }
         .fullScreenCover(isPresented: $showCamera) {
             PhotoCaptureView(
@@ -162,6 +178,20 @@ struct MealLogView: View {
                 }
             )
             .ignoresSafeArea()
+        }
+    }
+
+    private func handleSelectedPhoto(_ item: PhotosPickerItem?, viewModel: MealLogViewModel) {
+        guard let item else { return }
+        Task {
+            if let data = try? await item.loadTransferable(type: Data.self),
+               let image = UIImage(data: data) {
+                selectedItem = nil
+                viewModel.usePhoto(image)
+            } else {
+                selectedItem = nil
+                viewModel.retake()
+            }
         }
     }
 
