@@ -1,4 +1,3 @@
-// FILE: NutriTrack/Features/MealLogging/AnalysisResultView.swift
 
 import SwiftUI
 

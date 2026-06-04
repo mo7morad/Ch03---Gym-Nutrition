@@ -11,7 +11,8 @@ struct MealListSectionView: View {
                         MacroSummaryCard(meal: meal)
                     }
                 }
-                .padding(.vertical)
+                .padding(.horizontal, 16)
+        .padding(.vertical, 8)
         }
         .padding(.bottom, 30)
     }

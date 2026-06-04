@@ -9,6 +9,7 @@ struct NutriTrackApp: App {
         WindowGroup {
             RootView()
                 .environment(\.foodAnalysisService, AppDependencies.live.foodAnalysisService)
+                .environment(\.mealPhotoStorage, AppDependencies.live.mealPhotoStorage)
         }
         .modelContainer(PersistenceController.shared.container)
     }
