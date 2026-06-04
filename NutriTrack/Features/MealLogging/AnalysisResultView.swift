@@ -1,16 +1,12 @@
+// FILE: NutriTrack/Features/MealLogging/AnalysisResultView.swift
+
 import SwiftUI
 
-// AnalysisResultView shows what the mock (or AI) detected in the photo:
-// a list of food items and the combined macro totals for the meal.
-//
-// The view receives data and two callbacks — it has zero business logic.
-// "Log Meal" and "Retake" are decisions the ViewModel makes; this view just reports.
 struct AnalysisResultView: View {
     let items: [FoodItem]
     let onLog: () -> Void
     let onRetake: () -> Void
 
-    // Reuse MealEntry's computed totalNutrition rather than duplicating the reduce logic.
     private var total: NutritionInfo {
         MealEntry(id: UUID(), timestamp: .now, photoRef: nil, items: items).totalNutrition
     }
@@ -48,10 +44,32 @@ struct AnalysisResultView: View {
 #Preview {
     AnalysisResultView(
         items: [
-            FoodItem(id: UUID(), name: "Grilled Chicken",
-                     nutrition: NutritionInfo(calories: 320, proteinGrams: 42, carbsGrams: 0, fibreGrams: 0, fatGrams: 14)),
-            FoodItem(id: UUID(), name: "Brown Rice",
-                     nutrition: NutritionInfo(calories: 215, proteinGrams: 5, carbsGrams: 45, fibreGrams: 2, fatGrams: 2))
+            FoodItem(
+                id: UUID(),
+                name: "Grilled Chicken",
+                nutrition: NutritionInfo(
+                    foodName: "Grilled Chicken",
+                    calories: 320,
+                    protein: 42,
+                    carbs: 0,
+                    fat: 14,
+                    fiber: 0,
+                    servingSize: "200g"
+                )
+            ),
+            FoodItem(
+                id: UUID(),
+                name: "Brown Rice",
+                nutrition: NutritionInfo(
+                    foodName: "Brown Rice",
+                    calories: 215,
+                    protein: 5,
+                    carbs: 45,
+                    fat: 2,
+                    fiber: 2,
+                    servingSize: "180g"
+                )
+            )
         ],
         onLog: {},
         onRetake: {}

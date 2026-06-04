@@ -1,3 +1,5 @@
+// FILE: NutriTrack/App/NutriTrackApp.swift
+
 import SwiftUI
 import SwiftData
 
@@ -6,10 +8,8 @@ struct NutriTrackApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environment(\.foodAnalysisService, AppDependencies.live.foodAnalysisService)
         }
-        // .modelContainer injects the SwiftData container into the entire view hierarchy.
-        // Any view that uses @Query or @Environment(\.modelContext) will automatically
-        // receive this container — you don't need to pass it down manually.
         .modelContainer(PersistenceController.shared.container)
     }
 }

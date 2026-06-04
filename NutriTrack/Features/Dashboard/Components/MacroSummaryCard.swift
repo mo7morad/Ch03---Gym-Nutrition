@@ -85,7 +85,7 @@ struct MacroSummaryCard: View{
                           .frame(width: 12, height: 12)
                           
                       
-                      Text(String(format: "%.0fg", meal.totalNutrition.proteinGrams))
+                      Text(String(format: "%.0fg", meal.totalNutrition.protein))
                           .font(.system(size: 11))
                           .font(.system(size: 11))
                   }
@@ -114,8 +114,8 @@ struct MacroSummaryCard: View{
 
 #Preview {
     // Updated to match your exact FoodItem struct requirement (adding id: UUID())
-    let mockItem1 = FoodItem(id: UUID(), name: "Fried Rice", nutrition: NutritionInfo(calories: 350, proteinGrams: 10, carbsGrams: 45, fibreGrams: 3, fatGrams: 12))
-    let mockItem2 = FoodItem(id: UUID(), name: "Boiled Egg", nutrition: NutritionInfo(calories: 70, proteinGrams: 6, carbsGrams: 0, fibreGrams: 0, fatGrams: 5))
+    let mockItem1 = FoodItem(id: UUID(), name: "Fried Rice", nutrition: NutritionInfo(foodName: "Fried Rice", calories: 350, protein: 10, carbs: 45, fat: 12, fiber: 3, servingSize: "300g"))
+    let mockItem2 = FoodItem(id: UUID(), name: "Boiled Egg", nutrition: NutritionInfo(foodName: "Boiled Egg", calories: 70, protein: 6, carbs: 0, fat: 5, fiber: 0, servingSize: "50g"))
     
     let mockMeal = MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: [mockItem1, mockItem2])
     

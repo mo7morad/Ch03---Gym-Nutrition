@@ -1,11 +1,42 @@
+// FILE: NutriTrack/Core/Models/NutritionInfo.swift
+
 import Foundation
 
-// A reusable macro snapshot. Used by both FoodItem (per-item nutrition)
-// and MealEntry (aggregated total via its computed totalNutrition property).
-struct NutritionInfo {
-    var calories: Double
-    var proteinGrams: Double
-    var carbsGrams: Double
-    var fibreGrams: Double
-    var fatGrams: Double
+// MARK: - Model
+
+/// Nutritional breakdown of a single food item at a specific serving size.
+/// Represents macros scaled to the estimated gram weight of the food.
+/// This is a value type — no SwiftData, no @Model.
+struct NutritionInfo: Equatable, Hashable, Codable, Sendable {
+    let foodName: String
+    let calories: Double
+    let protein: Double
+    let carbs: Double
+    let fat: Double
+    let fiber: Double
+    let servingSize: String
+}
+
+// MARK: - Computed Helpers
+
+extension NutritionInfo {
+    var totalMacroGrams: Double {
+        protein + carbs + fat
+    }
+
+    var proteinFraction: Double {
+        totalMacroGrams > 0 ? protein / totalMacroGrams : 0
+    }
+
+    var carbsFraction: Double {
+        totalMacroGrams > 0 ? carbs / totalMacroGrams : 0
+    }
+
+    var fatFraction: Double {
+        totalMacroGrams > 0 ? fat / totalMacroGrams : 0
+    }
+
+    var fiberFraction: Double {
+        totalMacroGrams > 0 ? fiber / totalMacroGrams : 0
+    }
 }

@@ -12,23 +12,16 @@ struct PhotoCaptureView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-
-        let source: UIImagePickerController.SourceType =
-            UIImagePickerController.isSourceTypeAvailable(.camera) ? .camera : .photoLibrary
-        picker.sourceType = source
-
-        if source == .camera {
-            picker.cameraCaptureMode = .photo
-            picker.showsCameraControls = true
-        }
-
+        picker.sourceType = .camera
+        picker.cameraDevice = .rear
+        picker.allowsEditing = false
+        picker.cameraCaptureMode = .photo
+        picker.showsCameraControls = true
         picker.delegate = context.coordinator
         return picker
     }
 
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    // MARK: - Coordinator
 
     final class Coordinator: NSObject,
                              UIImagePickerControllerDelegate,
@@ -48,10 +41,6 @@ struct PhotoCaptureView: UIViewControllerRepresentable {
             didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
         ) {
             let image = (info[.editedImage] ?? info[.originalImage]) as? UIImage
-            // Call the closure FIRST — this triggers a SwiftUI state change
-            // which causes MealLogView to swap out PhotoCaptureView entirely.
-            // SwiftUI's own transition replaces the view; we don't need UIKit
-            // to also run a dismiss animation on a controller it no longer owns.
             if let image {
                 onPhotoCaptured(image)
             } else {
@@ -60,7 +49,6 @@ struct PhotoCaptureView: UIViewControllerRepresentable {
         }
 
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            // Same reasoning — let SwiftUI handle the transition.
             onCancel()
         }
     }

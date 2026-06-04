@@ -17,16 +17,8 @@ struct MealListSectionView: View {
 }
 
 #Preview {
-    let mockItem1 = FoodItem(
-        id: UUID(),
-        name: "Fried Rice",
-        nutrition: NutritionInfo(calories: 350, proteinGrams: 10, carbsGrams: 45, fibreGrams: 3, fatGrams: 12)
-    )
-    let mockItem2 = FoodItem(
-        id: UUID(),
-        name: "Boiled Egg",
-        nutrition: NutritionInfo(calories: 70, proteinGrams: 6, carbsGrams: 0, fibreGrams: 0, fatGrams: 5)
-    )
+    let mockItem1 = FoodItem(id: UUID(), name: "Fried Rice", nutrition: NutritionInfo(foodName: "Fried Rice", calories: 350, protein: 10, carbs: 45, fat: 12, fiber: 3, servingSize: "300g"))
+    let mockItem2 = FoodItem(id: UUID(), name: "Boiled Egg", nutrition: NutritionInfo(foodName: "Boiled Egg", calories: 70, protein: 6, carbs: 0, fat: 5, fiber: 0, servingSize: "50g"))
     
     let mockMeal1 = MealEntry(
         id: UUID(),
@@ -41,5 +33,8 @@ struct MealListSectionView: View {
         items: [mockItem1]
     )
     
-    return MealListSectionView(dailyMeals: [mockMeal1, mockMeal2])
+    // Advancing the clock by 4 hours for a second entry
+    let mockMeal2 = MealEntry(id: UUID(), timestamp: Date().addingTimeInterval(14400), photoRef: nil, items: [mockItem1])
+    
+    MealListSectionView(dailyMeals: [mockMeal1, mockMeal2])
 }
