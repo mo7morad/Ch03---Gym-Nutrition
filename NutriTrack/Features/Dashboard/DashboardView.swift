@@ -6,6 +6,8 @@ struct DashboardView: View {
     @State private var viewModel: MealLogViewModel?
     @State private var showCamera = false
     @State private var navigateToNext = false
+    @State private var foodItems: [FoodItem] = []
+
 
     
     let mockMeal1 = MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: [FoodItem(id: UUID(), name: "Fried Rice", nutrition: NutritionInfo(foodName: "Fried Rice", calories: 90, protein: 10, carbs: 4, fat: 2, fiber: 4, servingSize: "large"))])
@@ -145,7 +147,6 @@ struct DashboardView: View {
                 NavigationStack{
                     PhotoCaptureView(
                         onPhotoCaptured: { image in
-                            showCamera = false
                             viewModel!.usePhoto(image)
                             navigateToNext = true
                         },
@@ -155,7 +156,7 @@ struct DashboardView: View {
                     )
                     .ignoresSafeArea()
                     .navigationDestination(isPresented: $navigateToNext) {
-                        DashboardView()
+                        PhotoResultSummary(meal: MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: foodItems))
                     }
                 }
             }

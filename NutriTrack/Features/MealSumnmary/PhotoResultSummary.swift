@@ -127,21 +127,9 @@ struct PhotoResultSummary: View {
     }
 }
 
-//#Preview {
-//    // Instantiating mock data required by the compiler for canvas rendering
-//    let mockItem = FoodItem(
-//        id: UUID(),
-//        name: "Nugget Chilli Pepper",
-//        nutrition: NutritionInfo(calories: 680, proteinGrams: 24, carbsGrams: 78, fibreGrams: 5, fatGrams: 30)
-//    )
-//    
-//    let mockMeal = MealEntry(
-//        id: UUID(),
-//        timestamp: Date(),
-//        photoRef: nil,
-//        items: [mockItem]
-//    )
-//    
-//    PhotoResultSummary(meal: mockMeal)
-//    
-//}
+#Preview {
+    // Instantiating mock data required by the compiler for canvas rendering
+    let mockMeal = MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: [FoodItem(id: UUID(), name: "Eggs", nutrition: NutritionInfo(foodName: "Eggs", calories: 90, protein: 10, carbs: 4, fat: 2, fiber: 4, servingSize: "large"))])
+    PhotoResultSummary(meal: mockMeal)
+    
+}
