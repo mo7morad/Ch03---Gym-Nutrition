@@ -15,6 +15,7 @@ final class MealLogViewModel {
     }
 
     var step: Step = .capturing
+    private(set) var savedPhotoRef: String?
 
     private let analysisService: any FoodAnalysisService
 
@@ -25,21 +26,34 @@ final class MealLogViewModel {
     // MARK: - Transitions
 
     func retake() {
+        savedPhotoRef = nil
         step = .capturing
     }
 
     func usePhoto(_ image: UIImage) {
         step = .analyzing(image)
+        savedPhotoRef = try? ImageProcessingService.saveMealPhoto(image)
 
         Task {
             do {
                 let nutritionInfos = try await analysisService.analyze(image: image)
-                let foodItems = nutritionInfos.map { FoodItem(id: UUID(), name: $0.foodName, nutrition: $0) }
+                let foodItems = nutritionInfos.map {
+                    FoodItem(id: UUID(), name: $0.foodName, nutrition: $0)
+                }
                 step = .result(foodItems)
             } catch {
                 step = .failed(image, error)
             }
         }
+    }
+
+    func makeMealEntry(items: [FoodItem]) -> MealEntry {
+        MealEntry(
+            id: UUID(),
+            timestamp: .now,
+            photoRef: savedPhotoRef,
+            items: items
+        )
     }
 
     func logMeal() {

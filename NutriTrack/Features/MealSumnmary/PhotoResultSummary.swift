@@ -2,19 +2,19 @@
 //  PhotoResultSummary.swift
 //  NutriTrack
 //
-//  Created by Ni Ketut Lela Berliani on 03/06/26.
-//
 
 import SwiftUI
 
 struct PhotoResultSummary: View {
-    let meal : MealEntry
-    let columns = [
+    let meal: MealEntry
+    var onDone: () -> Void = {}
+    var onDismiss: () -> Void = {}
+
+    private let columns = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
     ]
-    
-    //computed property to matched the data
+
     private var mealTitle: String {
         let hour = Calendar.current.component(.hour, from: meal.timestamp)
         switch hour {
@@ -24,112 +24,141 @@ struct PhotoResultSummary: View {
         default: return "Dinner"
         }
     }
-    
+
     private var itemsSummary: String {
-        let names = meal.items.map { $0.name }
+        let names = meal.items.map(\.name)
         return names.isEmpty ? "Unknown Meal" : names.joined(separator: ", ")
     }
-    
-    
+
+    private var totals: NutritionInfo {
+        meal.totalNutrition
+    }
+
     var body: some View {
-        //photo
-        
         NavigationStack {
-            
-            VStack (alignment: .center, spacing: 12){
-                RoundedRectangle(cornerRadius: 25) //linked with image later
-                    .frame(width: 362, height: 326)
-                
-                
-                    VStack(alignment: .leading){
-                        Text(mealTitle)
-                            .fontWeight(.medium)
-                            .font(.system(size: 16))
-                            .foregroundStyle(Color(hex: "181818"))
-                            .opacity(0.5)
-                        
-                        Text(itemsSummary)
-                            .fontWeight(.semibold)
-                            .font(.system(size: 24))
-                            .foregroundStyle(Color(hex: "181818"))
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-        
-                //cards
+            VStack(alignment: .center, spacing: 12) {
+                mealPhotoView
+
+                VStack(alignment: .leading) {
+                    Text(mealTitle)
+                        .fontWeight(.medium)
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color(hex: "181818"))
+                        .opacity(0.5)
+
+                    Text(itemsSummary)
+                        .fontWeight(.semibold)
+                        .font(.system(size: 24))
+                        .foregroundStyle(Color(hex: "181818"))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
                 LazyVGrid(columns: columns, spacing: 16) {
-                                
                     MacroResultCard(
                         title: "Calories",
                         iconName: "flame",
-                        amount: 680,
+                        amount: totals.calories,
                         unit: "",
                         themeColor: .teal
                     )
-                    
+
                     MacroResultCard(
                         title: "Protein",
                         iconName: "p.circle",
-                        amount: 24,
+                        amount: totals.protein,
                         unit: "g",
                         themeColor: .pink
                     )
-                    
+
                     MacroResultCard(
                         title: "Carbs",
                         iconName: "leaf",
-                        amount: 78,
+                        amount: totals.carbs,
                         unit: "g",
                         themeColor: .orange
                     )
-                    
+
                     MacroResultCard(
                         title: "Fat",
                         iconName: "figure.arms.open",
-                        amount: 30,
+                        amount: totals.fat,
                         unit: "g",
                         themeColor: .indigo
                     )
                 }
-                
-                Button{}label:{
-                    ZStack{
+
+                Button(action: onDone) {
+                    ZStack {
                         RoundedRectangle(cornerRadius: 50)
-                            .frame(width: 362, height: 52)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 52)
                             .foregroundStyle(.black)
-                            
-                        
+
                         Text("Done")
-                            .font(Font.system(size: 14, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(.white)
                     }
                 }
-            
             }
             .padding()
-            .navigationTitle(Text("Macro Result"))
+            .navigationTitle("Macro Result")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar{
+            .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                    // Trigger the dismiss action when tapped
-    //                    dismiss()
-                    } label: {
-                        HStack(spacing: 4) {
+                    Button(action: onDismiss) {
                         Image(systemName: "xmark")
-                        .fontWeight(.semibold)
-                        
-                    }
-                    .foregroundStyle(Color(hex: "181818"))
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color(hex: "181818"))
                     }
                 }
             }
         }
     }
+
+    @ViewBuilder
+    private var mealPhotoView: some View {
+        Group {
+            if let photoRef = meal.photoRef,
+               let uiImage = ImageProcessingService.loadMealPhoto(from: photoRef) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                RoundedRectangle(cornerRadius: 25)
+                    .fill(Color(.systemGray5))
+                    .overlay {
+                        Image(systemName: "photo")
+                            .font(.largeTitle)
+                            .foregroundStyle(.secondary)
+                    }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 326)
+        .clipShape(RoundedRectangle(cornerRadius: 25))
+    }
 }
 
 #Preview {
-    // Instantiating mock data required by the compiler for canvas rendering
-    let mockMeal = MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: [FoodItem(id: UUID(), name: "Eggs", nutrition: NutritionInfo(foodName: "Eggs", calories: 90, protein: 10, carbs: 4, fat: 2, fiber: 4, servingSize: "large"))])
+    let mockMeal = MealEntry(
+        id: UUID(),
+        timestamp: Date(),
+        photoRef: nil,
+        items: [
+            FoodItem(
+                id: UUID(),
+                name: "Eggs",
+                nutrition: NutritionInfo(
+                    foodName: "Eggs",
+                    calories: 90,
+                    protein: 10,
+                    carbs: 4,
+                    fat: 2,
+                    fiber: 4,
+                    servingSize: "large"
+                )
+            )
+        ]
+    )
     PhotoResultSummary(meal: mockMeal)
-    
 }

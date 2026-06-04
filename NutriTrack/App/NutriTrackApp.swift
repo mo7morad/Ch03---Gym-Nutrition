@@ -8,7 +8,7 @@ struct NutriTrackApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environment(\.foodAnalysisService, AppDependencies.mock.foodAnalysisService)
+                .environment(\.foodAnalysisService, AppDependencies.live.foodAnalysisService)
         }
         .modelContainer(PersistenceController.shared.container)
     }
