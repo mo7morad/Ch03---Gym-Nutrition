@@ -47,19 +47,21 @@ struct MealLogView: View {
             analyzingView(image: image)
 
         case .result(let items):
-            PhotoResultSummary(
-                meal: viewModel.makeMealEntry(items: items),
-                context: .newMeal,
-                onDone: {
-                    let meal = viewModel.makeMealEntry(items: items)
-                    viewModel.logMeal(meal)
-                    onComplete(meal)
-                },
-                onDismiss: {
-                    viewModel.retake()
-                    onCancel()
-                }
-            )
+            NavigationStack {
+                PhotoResultSummary(
+                    meal: viewModel.makeMealEntry(items: items),
+                    context: .newMeal,
+                    onDone: {
+                        let meal = viewModel.makeMealEntry(items: items)
+                        viewModel.logMeal(meal)
+                        onComplete(meal)
+                    },
+                    onDismiss: {
+                        viewModel.retake()
+                        onCancel()
+                    }
+                )
+            }
 
         case .failed(let image, let error):
             failedView(image: image, error: error, viewModel: viewModel)

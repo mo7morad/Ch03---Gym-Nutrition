@@ -4,7 +4,7 @@ import SwiftData
 struct DashboardView: View {
     @Query private var profiles: [UserProfile]
 
-    @State private var toggleStreak: Bool = true
+    @State private var toggleStreak: Bool = false
     @State private var mealLogPresentation: MealLogPresentation?
     @State private var dailyMeals: [MealEntry] = []
 

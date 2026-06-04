@@ -30,14 +30,17 @@ struct MacroResultCard: View {
             .font(.subheadline.weight(.medium))
 
             Text(formattedAmount)
-                .font(.title.weight(.semibold))
+                .font(.title2.weight(.semibold))
                 .foregroundStyle(.primary)
                 .minimumScaleFactor(0.8)
                 .lineLimit(1)
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, minHeight: 111, alignment: .leading)
-        .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 12))
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 88, alignment: .leading)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white)
+        }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title), \(formattedAmount)")
     }

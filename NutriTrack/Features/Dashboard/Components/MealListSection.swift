@@ -3,25 +3,22 @@ import SwiftUI
 struct MealListSectionView: View {
     let dailyMeals: [MealEntry]
 
-    @State private var selectedMeal: MealEntry?
-
     var body: some View {
         LazyVStack(spacing: 16) {
             ForEach(dailyMeals) { meal in
-                MacroSummaryCard(meal: meal) {
-                    selectedMeal = meal
+                NavigationLink(value: meal.id) {
+                    MacroSummaryCard(meal: meal)
                 }
+                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .padding(.bottom, 30)
-        .sheet(item: $selectedMeal) { meal in
-            PhotoResultSummary(
-                meal: meal,
-                context: .loggedMeal,
-                onDismiss: { selectedMeal = nil }
-            )
+        .navigationDestination(for: UUID.self) { mealID in
+            if let meal = dailyMeals.first(where: { $0.id == mealID }) {
+                PhotoResultSummary(meal: meal, context: .loggedMeal)
+            }
         }
     }
 }
@@ -43,5 +40,7 @@ struct MealListSectionView: View {
         items: [mockItem1]
     )
     
-    MealListSectionView(dailyMeals: [mockMeal1, mockMeal2])
+    NavigationStack {
+        MealListSectionView(dailyMeals: [mockMeal1, mockMeal2])
+    }
 }

@@ -15,62 +15,72 @@ struct PhotoResultSummary: View {
     var context: Context = .newMeal
     var onDone: () -> Void = {}
     var onDismiss: () -> Void = {}
-    var onEdit: (() -> Void)? = nil
-
-    private let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
 
     private var totals: NutritionInfo {
         meal.totalNutrition
     }
 
+    private var photoHeight: CGFloat {
+        context == .loggedMeal ? 220 : 280
+    }
+
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+        ZStack(alignment: .bottom) {
+            ScrollView(.vertical, showsIndicators: true) {
+                VStack(alignment: .leading, spacing: 20) {
                     mealPhotoView
 
                     Text(meal.mealHeadline)
-                        .font(.system(size: 24, weight: .semibold))
+                        .font(.system(size: 22, weight: .semibold))
                         .foregroundStyle(Color(hex: "181818"))
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
                     macroGrid
 
                     if context == .loggedMeal {
                         ingredientsSection
-                        loggedConfirmation
                     }
 
                     if context == .newMeal {
                         doneButton
                     }
                 }
-                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, context == .loggedMeal ? MealLoggedConfirmationView.scrollBottomInset : 32)
             }
-            .background(Color(hex: "F3F3F3"))
-            .navigationTitle(meal.mealPeriodTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: onDismiss) {
-                        Image(systemName: "xmark")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color(hex: "181818"))
-                    }
-                }
+            .scrollBounceBehavior(.basedOnSize)
 
-                if context == .loggedMeal {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Edit") {
-                            onEdit?()
-                        }
+            if context == .loggedMeal {
+                MealLoggedConfirmationView()
+                    .ignoresSafeArea(edges: .bottom)
+            }
+        }
+        .clipped()
+        .background(Color(hex: "F3F3F3"))
+        .navigationTitle(meal.mealPeriodTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(context == .loggedMeal)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: close) {
+                    Image(systemName: context == .loggedMeal ? "chevron.left" : "xmark")
                         .fontWeight(.semibold)
                         .foregroundStyle(Color(hex: "181818"))
-                    }
                 }
             }
+        }
+    }
+
+    private func close() {
+        if context == .loggedMeal {
+            dismiss()
+        } else {
+            onDismiss()
         }
     }
 
@@ -78,82 +88,77 @@ struct PhotoResultSummary: View {
 
     @ViewBuilder
     private var mealPhotoView: some View {
-        ZStack(alignment: .bottomLeading) {
-            Group {
-                if let photoRef = meal.photoRef,
-                   let uiImage = ImageProcessingService.loadMealPhoto(from: photoRef) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    RoundedRectangle(cornerRadius: 25)
-                        .fill(Color(.systemGray5))
-                        .overlay {
-                            Image(systemName: "photo")
-                                .font(.largeTitle)
-                                .foregroundStyle(.secondary)
-                        }
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 326)
-            .clipShape(RoundedRectangle(cornerRadius: 25))
-
-            if context == .loggedMeal, meal.photoRef != nil {
-                Image(systemName: "trash")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .padding(10)
-                    .background(.black.opacity(0.35), in: Circle())
-                    .padding(16)
-                    .accessibilityLabel("Delete photo")
+        Group {
+            if let photoRef = meal.photoRef,
+               let uiImage = ImageProcessingService.loadMealPhoto(from: photoRef) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.systemGray5))
+                    .overlay {
+                        Image(systemName: "photo")
+                            .font(.largeTitle)
+                            .foregroundStyle(.secondary)
+                    }
             }
         }
+        .frame(maxWidth: .infinity)
+        .frame(height: photoHeight)
+        .clipped()
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 
     // MARK: - Macros
 
     private var macroGrid: some View {
-        LazyVGrid(columns: columns, spacing: 16) {
-            MacroResultCard(
-                title: "Calories",
-                iconName: "flame.fill",
-                amount: totals.calories,
-                unit: "kcal",
-                themeColor: Color(hex: "10937E")
-            )
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                MacroResultCard(
+                    title: "Calories",
+                    iconName: "flame.fill",
+                    amount: totals.calories,
+                    unit: "kcal",
+                    themeColor: Color(hex: "10937E")
+                )
+                MacroResultCard(
+                    title: "Protein",
+                    iconName: "p.circle.fill",
+                    amount: totals.protein,
+                    unit: "g",
+                    themeColor: Color(hex: "D16D8E")
+                )
+            }
 
-            MacroResultCard(
-                title: "Protein",
-                iconName: "p.circle.fill",
-                amount: totals.protein,
-                unit: "g",
-                themeColor: Color(hex: "D16D8E")
-            )
+            HStack(spacing: 12) {
+                MacroResultCard(
+                    title: "Carbs",
+                    iconName: "leaf.fill",
+                    amount: totals.carbs,
+                    unit: "g",
+                    themeColor: .orange
+                )
+                MacroResultCard(
+                    title: "Fat",
+                    iconName: "drop.fill",
+                    amount: totals.fat,
+                    unit: "g",
+                    themeColor: .indigo
+                )
+            }
 
-            MacroResultCard(
-                title: "Carbs",
-                iconName: "leaf.fill",
-                amount: totals.carbs,
-                unit: "g",
-                themeColor: .orange
-            )
-
-            MacroResultCard(
-                title: "Fat",
-                iconName: "drop.fill",
-                amount: totals.fat,
-                unit: "g",
-                themeColor: .indigo
-            )
-
-            MacroResultCard(
-                title: "Fiber",
-                iconName: "leaf.circle.fill",
-                amount: totals.fiber,
-                unit: "g",
-                themeColor: Color(hex: "8A9B3B")
-            )
+            HStack(spacing: 12) {
+                MacroResultCard(
+                    title: "Fiber",
+                    iconName: "leaf.circle.fill",
+                    amount: totals.fiber,
+                    unit: "g",
+                    themeColor: Color(hex: "8A9B3B")
+                )
+                Color.clear
+                    .frame(maxWidth: .infinity)
+            }
         }
     }
 
@@ -169,21 +174,9 @@ struct PhotoResultSummary: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color(hex: "181818"))
                 .opacity(0.5)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private var loggedConfirmation: some View {
-        VStack(spacing: 8) {
-            AppCharacter(width: 120)
-
-            Text("Your meal is logged!")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(Color(hex: "181818"))
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 8)
-        .padding(.bottom, 24)
     }
 
     // MARK: - New meal
@@ -197,43 +190,43 @@ struct PhotoResultSummary: View {
                 .frame(height: 52)
                 .background(.black, in: RoundedRectangle(cornerRadius: 50))
         }
-        .padding(.top, 8)
     }
 }
 
 #Preview("Logged meal") {
-    let mockMeal = MealEntry(
-        id: UUID(),
-        timestamp: Date(),
-        photoRef: nil,
-        items: [
-            FoodItem(
-                id: UUID(),
-                name: "rice, brown, cooked",
-                nutrition: NutritionInfo(
-                    foodName: "Rice",
-                    calories: 215,
-                    protein: 5,
-                    carbs: 45,
-                    fat: 2,
-                    fiber: 4,
-                    servingSize: "1 cup"
+    NavigationStack {
+        PhotoResultSummary(meal: MealEntry(
+            id: UUID(),
+            timestamp: Date(),
+            photoRef: nil,
+            items: [
+                FoodItem(
+                    id: UUID(),
+                    name: "rice, white, cooked",
+                    nutrition: NutritionInfo(
+                        foodName: "Rice",
+                        calories: 215,
+                        protein: 5,
+                        carbs: 45,
+                        fat: 2,
+                        fiber: 4,
+                        servingSize: "1 cup"
+                    )
+                ),
+                FoodItem(
+                    id: UUID(),
+                    name: "chicken, leg, cooked",
+                    nutrition: NutritionInfo(
+                        foodName: "Chicken leg",
+                        calories: 320,
+                        protein: 18,
+                        carbs: 20,
+                        fat: 20,
+                        fiber: 1,
+                        servingSize: "1 leg"
+                    )
                 )
-            ),
-            FoodItem(
-                id: UUID(),
-                name: "chicken, nugget",
-                nutrition: NutritionInfo(
-                    foodName: "Chicken Nugget",
-                    calories: 320,
-                    protein: 18,
-                    carbs: 20,
-                    fat: 20,
-                    fiber: 1,
-                    servingSize: "6 pieces"
-                )
-            )
-        ]
-    )
-    PhotoResultSummary(meal: mockMeal, context: .loggedMeal)
+            ]
+        ), context: .loggedMeal)
+    }
 }

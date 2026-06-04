@@ -13,14 +13,22 @@ extension MealEntry {
     }
 
     var itemDisplayNames: [String] {
-        items.map { USDAQuerySanitizer.displayName(from: $0.name) }
+        items.map { item in
+            let label = item.nutrition.foodName.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !label.isEmpty {
+                return USDAQuerySanitizer.readableName(from: label)
+            }
+            return USDAQuerySanitizer.readableName(from: item.name)
+        }
     }
 
-    /// Primary headline on the meal detail screen.
+    /// Short title for the meal detail screen; full items live under Ingredients.
     var mealHeadline: String {
         let names = itemDisplayNames
-        guard !names.isEmpty else { return "Unknown Meal" }
-        return names.joined(separator: " ")
+        guard let first = names.first else { return "Unknown Meal" }
+        if names.count == 1 { return first }
+        if names.count == 2 { return "\(first) and \(names[1])" }
+        return "\(first) + \(names.count - 1) more"
     }
 
     /// Comma-separated ingredient list for the detail screen.

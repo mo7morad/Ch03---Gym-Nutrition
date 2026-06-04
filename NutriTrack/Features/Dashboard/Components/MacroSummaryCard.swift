@@ -5,7 +5,6 @@ import SwiftUI
 
 struct MacroSummaryCard: View {
     let meal: MealEntry
-    var onSelect: () -> Void = {}
 
     private var itemsSummary: String {
         let names = meal.itemDisplayNames
@@ -20,7 +19,6 @@ struct MacroSummaryCard: View {
     }
 
     var body: some View {
-      Button(action: onSelect) {
       ZStack{
             RoundedRectangle(cornerRadius: 12)
               .foregroundStyle(Color(hex: "E8E8E8"))
@@ -99,8 +97,6 @@ struct MacroSummaryCard: View {
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(hex: "E8E8E8"), in: RoundedRectangle(cornerRadius: 12))
-      }
-      .buttonStyle(.plain)
     }
 }
 

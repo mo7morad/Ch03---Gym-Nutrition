@@ -68,4 +68,46 @@ enum USDAQuerySanitizer {
 
         return parts.reversed().joined(separator: " ").localizedCapitalized
     }
+
+    /// Short, natural label for UI (e.g. "chicken, breast, cooked" → "Chicken breast").
+    static func readableName(from raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return raw }
+
+        let parts = trimmed
+            .split(separator: ",")
+            .map { cleanReadablePart($0.trimmingCharacters(in: .whitespaces)) }
+            .filter { !$0.isEmpty }
+
+        guard parts.count > 1 else {
+            return cleanReadablePart(trimmed).localizedCapitalized
+        }
+
+        if parts[0].lowercased() == "sauce", let flavor = parts.dropFirst().first {
+            return "\(flavor.localizedCapitalized) sauce"
+        }
+
+        let preparation = Set(["cooked", "raw", "boiled", "fried", "grilled", "baked", "steamed", "roasted", "heated"])
+        let noise = ["nfs", "ns as to", "broilers or fryers", "meat only", "skin only", "without skin", "with skin", "type"]
+
+        let modifiers = parts.dropFirst().filter { part in
+            let lower = part.lowercased()
+            guard !preparation.contains(lower) else { return false }
+            guard lower != "type" else { return false }
+            return !noise.contains(where: { lower.contains($0) })
+        }
+
+        let words = ([parts[0]] + modifiers.prefix(2))
+            .map { $0.localizedCapitalized }
+            .joined(separator: " ")
+
+        return words.isEmpty ? parts[0].localizedCapitalized : words
+    }
+
+    private static func cleanReadablePart(_ part: String) -> String {
+        part
+            .replacingOccurrences(of: #"\btype\b"#, with: "", options: [.regularExpression, .caseInsensitive])
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespaces)
+    }
 }
