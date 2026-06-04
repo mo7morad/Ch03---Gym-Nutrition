@@ -5,6 +5,7 @@ struct MealLogView: View {
 
     let onComplete: () -> Void
     let onCancel: () -> Void
+    var startsWithCamera: Bool = false
 
     @Environment(\.foodAnalysisService) private var foodAnalysisService
     @State private var viewModel: MealLogViewModel?
@@ -32,26 +33,44 @@ struct MealLogView: View {
         switch viewModel.step {
 
         case .capturing:
-            choiceScreen(viewModel: viewModel)
+            if startsWithCamera {
+                cameraCaptureScreen(viewModel: viewModel)
+            } else {
+                choiceScreen(viewModel: viewModel)
+            }
 
         case .analyzing(let image):
             analyzingView(image: image)
 
         case .result(let items):
-            AnalysisResultView(
-                items: items,
-                onLog: {
+            PhotoResultSummary(
+                meal: viewModel.makeMealEntry(items: items),
+                onDone: {
                     viewModel.logMeal()
                     onComplete()
                 },
-                onRetake: {
+                onDismiss: {
                     viewModel.retake()
+                    onCancel()
                 }
             )
 
         case .failed(let image, let error):
             failedView(image: image, error: error, viewModel: viewModel)
         }
+    }
+
+    // MARK: - Camera-only capture (dashboard entry)
+
+    @ViewBuilder
+    private func cameraCaptureScreen(viewModel: MealLogViewModel) -> some View {
+        PhotoCaptureView(
+            onPhotoCaptured: { image in
+                viewModel.usePhoto(image)
+            },
+            onCancel: onCancel
+        )
+        .ignoresSafeArea()
     }
 
     // MARK: - Choice Screen

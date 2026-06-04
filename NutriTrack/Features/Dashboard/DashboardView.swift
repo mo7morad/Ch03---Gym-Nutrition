@@ -2,120 +2,129 @@ import SwiftUI
 
 struct DashboardView: View {
     @State private var toggleStreak: Bool = true
-    @Environment(\.foodAnalysisService) private var foodAnalysisService
-    @State private var viewModel: MealLogViewModel?
-    @State private var showCamera = false
-    @State private var navigateToNext = false
-    @State private var foodItems: [FoodItem] = []
+    @State private var showMealLog = false
 
+    let mockMeal1 = MealEntry(
+        id: UUID(),
+        timestamp: Date(),
+        photoRef: nil,
+        items: [
+            FoodItem(
+                id: UUID(),
+                name: "Fried Rice",
+                nutrition: NutritionInfo(
+                    foodName: "Fried Rice",
+                    calories: 90,
+                    protein: 10,
+                    carbs: 4,
+                    fat: 2,
+                    fiber: 4,
+                    servingSize: "large"
+                )
+            )
+        ]
+    )
 
-    
-    let mockMeal1 = MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: [FoodItem(id: UUID(), name: "Fried Rice", nutrition: NutritionInfo(foodName: "Fried Rice", calories: 90, protein: 10, carbs: 4, fat: 2, fiber: 4, servingSize: "large"))])
-    
-    let mockMeal2 = MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: [FoodItem(id: UUID(), name: "Eggs", nutrition: NutritionInfo(foodName: "Eggs", calories: 90, protein: 10, carbs: 4, fat: 2, fiber: 4, servingSize: "large"))])
-    
-    
+    let mockMeal2 = MealEntry(
+        id: UUID(),
+        timestamp: Date(),
+        photoRef: nil,
+        items: [
+            FoodItem(
+                id: UUID(),
+                name: "Eggs",
+                nutrition: NutritionInfo(
+                    foodName: "Eggs",
+                    calories: 90,
+                    protein: 10,
+                    carbs: 4,
+                    fat: 2,
+                    fiber: 4,
+                    servingSize: "large"
+                )
+            )
+        ]
+    )
+
     var body: some View {
-        NavigationStack{
-            ScrollView{
+        NavigationStack {
+            ScrollView {
                 VStack {
                     Image("AppCharacter")
                         .resizable()
                         .frame(width: 220, height: 150)
                         .padding(.top, 40)
-                    
+
                     CaloriesMacrosView()
-                    
+
                     MealListSectionView(dailyMeals: [mockMeal1, mockMeal2])
-                    
                 }
             }
-            .task {
-                if viewModel == nil {
-                    viewModel = MealLogViewModel(analysisService: foodAnalysisService)
-                }
-            }
-            .toolbar{
-                // Streak Toolbar
+            .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    Button{
+                    Button {
                         withAnimation(.spring()) {
                             toggleStreak.toggle()
                         }
-                    } label:{
-                        HStack{
+                    } label: {
+                        HStack {
                             Image(systemName: "flame")
                         }
                     }
                     Text("1")
                         .offset(x: -12)
                 }
-                
-                
-                // Profile Toolbar
-                ToolbarItem(placement: .topBarTrailing){
+
+                ToolbarItem(placement: .topBarTrailing) {
                     Image(systemName: "person.fill")
                 }
-                
-                
-                // Add Meal Toolbar
-                ToolbarItemGroup(placement: .bottomBar){
+
+                ToolbarItemGroup(placement: .bottomBar) {
                     Spacer()
-                    
+
                     Menu {
-                        
-                        // Take Photo
-                        Button{
-                        } label:{
-                            HStack{
+                        Button {} label: {
+                            HStack {
                                 Image(systemName: "photo.fill.on.rectangle.fill")
                                 Text("Choose Photo")
                             }
-                            
                         }
-                        
-                        // Choose Photo
-                        Button{
-                            showCamera = true
-                        } label:{
-                            HStack{
+
+                        Button {
+                            showMealLog = true
+                        } label: {
+                            HStack {
                                 Image(systemName: "camera.fill")
                                 Text("Take Photo")
                             }
                         }
-                        
-                        
                     } label: {
                         Image(systemName: "plus.circle.fill")
                         Text("Add Meal  ")
                     }
                     .contentShape(Rectangle())
-                    
                 }
             }
-            .overlay(alignment: .top){
-                if(toggleStreak){
-                    ZStack{
-
+            .overlay(alignment: .top) {
+                if toggleStreak {
+                    ZStack {
                         Rectangle()
                             .frame(height: 160)
                             .opacity(0)
                             .glassEffect(in: RoundedRectangle(cornerRadius: 30))
                             .padding(.horizontal, 20)
-                            .blur(radius:1.2)
-                        
-                        VStack(alignment: .leading){
+                            .blur(radius: 1.2)
+
+                        VStack(alignment: .leading) {
                             Text("Weekly Streak")
-                                .font(.system(size: 20) .bold())
+                                .font(.system(size: 20).bold())
                                 .padding(.leading, 40)
-                            
-                            HStack(spacing: 10){
-                                let weekdays: [String] = [
-                                    "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"
-                                ]
-                                ForEach(0..<7, id: \.self){ i in
-                                    VStack{
-                                        ZStack{
+
+                            HStack(spacing: 10) {
+                                let weekdays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+                                ForEach(0..<7, id: \.self) { i in
+                                    VStack {
+                                        ZStack {
                                             Rectangle()
                                                 .frame(width: 35, height: 75)
                                                 .cornerRadius(20)
@@ -130,9 +139,9 @@ struct DashboardView: View {
                                                     )
                                                 )
                                             Image(systemName: "flame.fill")
-                                                .foregroundStyle(Color.white)
+                                                .foregroundStyle(.white)
                                         }
-                                        
+
                                         Text(weekdays[i])
                                     }
                                 }
@@ -140,30 +149,24 @@ struct DashboardView: View {
                             .padding(.horizontal, 40)
                         }
                     }
-                    .transition(.move(edge: .top).combined(with: .move(edge: .leading)).combined(with: .scale).combined(with: .opacity))
-                }
-                
-            }.fullScreenCover(isPresented: $showCamera) {
-                NavigationStack{
-                    PhotoCaptureView(
-                        onPhotoCaptured: { image in
-                            viewModel!.usePhoto(image)
-                            navigateToNext = true
-                        },
-                        onCancel: {
-                            showCamera = false
-                        }
+                    .transition(
+                        .move(edge: .top)
+                            .combined(with: .move(edge: .leading))
+                            .combined(with: .scale)
+                            .combined(with: .opacity)
                     )
-                    .ignoresSafeArea()
-                    .navigationDestination(isPresented: $navigateToNext) {
-                        PhotoResultSummary(meal: MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: foodItems))
-                    }
                 }
+            }
+            .fullScreenCover(isPresented: $showMealLog) {
+                MealLogView(
+                    onComplete: { showMealLog = false },
+                    onCancel: { showMealLog = false },
+                    startsWithCamera: true
+                )
             }
             .background(Color(hex: "F3F3F3"))
         }
     }
-    
 }
 
 #Preview {
