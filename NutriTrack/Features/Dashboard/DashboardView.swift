@@ -1,8 +1,12 @@
 import SwiftUI
 
 struct DashboardView: View {
-    @State private var viewModel = DashboardViewModel()
     @State private var toggleStreak: Bool = true
+    @Environment(\.foodAnalysisService) private var foodAnalysisService
+    @State private var viewModel: MealLogViewModel?
+    @State private var showCamera = false
+    @State private var navigateToNext = false
+
     
     let mockMeal1 = MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, items: [FoodItem(id: UUID(), name: "Fried Rice", nutrition: NutritionInfo(foodName: "Fried Rice", calories: 90, protein: 10, carbs: 4, fat: 2, fiber: 4, servingSize: "large"))])
     
@@ -22,6 +26,11 @@ struct DashboardView: View {
                     
                     MealListSectionView(dailyMeals: [mockMeal1, mockMeal2])
                     
+                }
+            }
+            .task {
+                if viewModel == nil {
+                    viewModel = MealLogViewModel(analysisService: foodAnalysisService)
                 }
             }
             .toolbar{
@@ -55,7 +64,6 @@ struct DashboardView: View {
                         
                         // Take Photo
                         Button{
-                            
                         } label:{
                             HStack{
                                 Image(systemName: "photo.fill.on.rectangle.fill")
@@ -66,7 +74,7 @@ struct DashboardView: View {
                         
                         // Choose Photo
                         Button{
-                            
+                            showCamera = true
                         } label:{
                             HStack{
                                 Image(systemName: "camera.fill")
@@ -133,6 +141,23 @@ struct DashboardView: View {
                     .transition(.move(edge: .top).combined(with: .move(edge: .leading)).combined(with: .scale).combined(with: .opacity))
                 }
                 
+            }.fullScreenCover(isPresented: $showCamera) {
+                NavigationStack{
+                    PhotoCaptureView(
+                        onPhotoCaptured: { image in
+                            showCamera = false
+                            viewModel!.usePhoto(image)
+                            navigateToNext = true
+                        },
+                        onCancel: {
+                            showCamera = false
+                        }
+                    )
+                    .ignoresSafeArea()
+                    .navigationDestination(isPresented: $navigateToNext) {
+                        DashboardView()
+                    }
+                }
             }
             .background(Color(hex: "F3F3F3"))
         }
