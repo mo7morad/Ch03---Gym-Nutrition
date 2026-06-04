@@ -22,7 +22,12 @@ final class FoodAnalysisServiceLive: FoodAnalysisService, @unchecked Sendable {
             return []
         }
 
-        let lookupItems = identifiedFoods.map { (name: $0.name, weightGrams: $0.estimatedWeightGrams) }
+        let lookupItems = identifiedFoods.map { food in
+            (
+                name: food.name,
+                weightGrams: USDAQuerySanitizer.clampWeight(food.estimatedWeightGrams)
+            )
+        }
         return try await nutritionClient.lookup(foods: lookupItems)
     }
 }

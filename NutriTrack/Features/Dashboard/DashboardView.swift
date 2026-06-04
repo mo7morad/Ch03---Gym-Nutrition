@@ -1,8 +1,33 @@
 import SwiftUI
+import SwiftData
 
 struct DashboardView: View {
-    @State private var viewModel = DashboardViewModel()
+    @Query private var profiles: [UserProfile]
+
     @State private var toggleStreak: Bool = true
+    @State private var showMealLog = false
+    @State private var dailyMeals: [MealEntry] = []
+
+    private var nutritionGoal: NutritionGoal {
+        guard let profile = profiles.first else {
+            return NutritionGoal(
+                dailyCalories: 2550,
+                proteinGrams: 191,
+                carbsGrams: 255,
+                fibreGrams: 36,
+                fatGrams: 85
+            )
+        }
+        return NutritionCalculator.calculate(for: profile)
+    }
+
+    private var todaysMeals: [MealEntry] {
+        dailyMeals.meals(on: .now)
+    }
+
+    private var consumedToday: NutritionInfo {
+        todaysMeals.totalNutrition
+    }
 
     var body: some View {
         NavigationStack {
@@ -13,18 +38,24 @@ struct DashboardView: View {
                         .frame(width: 220, height: 150)
                         .padding(.top, 40)
 
-                    CaloriesMacrosView()
+                    CaloriesMacrosView(
+                        calories: Int(consumedToday.calories.rounded()),
+                        caloriesTarget: Int(nutritionGoal.dailyCalories.rounded()),
+                        macros: [
+                            "Protein": Int(consumedToday.protein.rounded()),
+                            "Carbs": Int(consumedToday.carbs.rounded()),
+                            "Fat": Int(consumedToday.fat.rounded()),
+                            "Fiber": Int(consumedToday.fiber.rounded())
+                        ],
+                        macrosTarget: [
+                            "Protein": Int(nutritionGoal.proteinGrams.rounded()),
+                            "Carbs": Int(nutritionGoal.carbsGrams.rounded()),
+                            "Fat": Int(nutritionGoal.fatGrams.rounded()),
+                            "Fiber": Int(nutritionGoal.fibreGrams.rounded())
+                        ]
+                    )
 
-                    if viewModel.dailyMeals.isEmpty {
-                        ContentUnavailableView(
-                            "No Meals Today",
-                            systemImage: "fork.knife",
-                            description: Text("Tap Add Meal to log your first meal.")
-                        )
-                        .padding(.vertical, 24)
-                    } else {
-                        MealListSectionView(dailyMeals: viewModel.dailyMeals)
-                    }
+                    MealListSectionView(dailyMeals: todaysMeals)
                 }
             }
             .toolbar {
@@ -49,8 +80,22 @@ struct DashboardView: View {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Spacer()
 
-                    Button {
-                        viewModel.presentMealLog()
+                    Menu {
+                        Button {} label: {
+                            HStack {
+                                Image(systemName: "photo.fill.on.rectangle.fill")
+                                Text("Choose Photo")
+                            }
+                        }
+
+                        Button {
+                            showMealLog = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "camera.fill")
+                                Text("Take Photo")
+                            }
+                        }
                     } label: {
                         Label("Add Meal", systemImage: "plus.circle.fill")
                     }
@@ -73,9 +118,7 @@ struct DashboardView: View {
                                 .padding(.leading, 40)
 
                             HStack(spacing: 10) {
-                                let weekdays: [String] = [
-                                    "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"
-                                ]
+                                let weekdays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
                                 ForEach(0..<7, id: \.self) { i in
                                     VStack {
                                         ZStack {
@@ -93,7 +136,7 @@ struct DashboardView: View {
                                                     )
                                                 )
                                             Image(systemName: "flame.fill")
-                                                .foregroundStyle(Color.white)
+                                                .foregroundStyle(.white)
                                         }
 
                                         Text(weekdays[i])
@@ -103,8 +146,23 @@ struct DashboardView: View {
                             .padding(.horizontal, 40)
                         }
                     }
-                    .transition(.move(edge: .top).combined(with: .move(edge: .leading)).combined(with: .scale).combined(with: .opacity))
+                    .transition(
+                        .move(edge: .top)
+                            .combined(with: .move(edge: .leading))
+                            .combined(with: .scale)
+                            .combined(with: .opacity)
+                    )
                 }
+            }
+            .fullScreenCover(isPresented: $showMealLog) {
+                MealLogView(
+                    onComplete: { meal in
+                        dailyMeals.insert(meal, at: 0)
+                        showMealLog = false
+                    },
+                    onCancel: { showMealLog = false },
+                    startsWithCamera: true
+                )
             }
             .background(Color(hex: "F3F3F3"))
         }
@@ -124,6 +182,5 @@ struct DashboardView: View {
 
 #Preview {
     DashboardView()
-        .environment(\.foodAnalysisService, FoodAnalysisServiceMock())
-        .environment(\.mealPhotoStorage, ImageProcessingService())
+        .modelContainer(PersistenceController.shared.container)
 }
