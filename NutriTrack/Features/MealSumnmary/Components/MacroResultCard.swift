@@ -45,30 +45,30 @@ struct MacroResultCard: View {
     }
 }
 
-#Preview {
-    // 1. Initialize mock data models
-    let mockItem = FoodItem(
-        id: UUID(),
-        name: "Grilled Chicken Salad",
-        nutrition: NutritionInfo(calories: 680, proteinGrams: 45, carbsGrams: 20, fibreGrams: 8, fatGrams: 30)
-    )
-    
-    let mockMeal = MealEntry(
-        id: UUID(),
-        timestamp: Date(),
-        photoRef: nil,
-        items: [mockItem]
-    )
-    
-    // 2. Render UI components using the computed totalNutrition property
-        
-        // Protein Card
-        MacroResultCard(
-            title: "Protein",
-            iconName: "p.circle",
-            amount: mockMeal.totalNutrition.proteinGrams,
-            unit: "g",
-            themeColor: Color(hex: "D16D8E") // Assuming a distinct color for Protein
-        )
-
-}
+//#Preview {
+//    // 1. Initialize mock data models
+//    let mockItem = FoodItem(
+//        id: UUID(),
+//        name: "Grilled Chicken Salad",
+//        nutrition: NutritionInfo(calories: 680, proteinGrams: 45, carbsGrams: 20, fibreGrams: 8, fatGrams: 30)
+//    )
+//    
+//    let mockMeal = MealEntry(
+//        id: UUID(),
+//        timestamp: Date(),
+//        photoRef: nil,
+//        items: [mockItem]
+//    )
+//    
+//    // 2. Render UI components using the computed totalNutrition property
+//        
+//        // Protein Card
+//        MacroResultCard(
+//            title: "Protein",
+//            iconName: "p.circle",
+//            amount: mockMeal.totalNutrition.proteinGrams,
+//            unit: "g",
+//            themeColor: Color(hex: "D16D8E") // Assuming a distinct color for Protein
+//        )
+//
+//}

@@ -34,8 +34,5 @@ struct MealListSectionView: View {
         items: [mockItem1]
     )
     
-    // Advancing the clock by 4 hours for a second entry
-    let mockMeal2 = MealEntry(id: UUID(), timestamp: Date().addingTimeInterval(14400), photoRef: nil, items: [mockItem1])
-    
     MealListSectionView(dailyMeals: [mockMeal1, mockMeal2])
 }
