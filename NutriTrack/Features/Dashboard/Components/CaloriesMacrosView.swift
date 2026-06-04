@@ -8,21 +8,12 @@
 import SwiftUI
 
 struct CaloriesMacrosView: View {
+    let calories: Int
+    let caloriesTarget: Int
+    let macros: [String: Int]
+    let macrosTarget: [String: Int]
+
     @State private var isExpanded: Bool = true
-    @State var calories: Int = 1500
-    @State var caloriesTarget: Int = 2550
-    @State var macros: [String: Int] = [
-            "Carbs": 80,
-            "Protein": 80,
-            "Fat": 80,
-            "Fiber": 80
-    ]
-    @State var macrosTarget: [String: Int] = [
-            "Carbs": 200,
-            "Protein": 200,
-            "Fat": 200,
-            "Fiber": 200
-    ]
     
     var body: some View {
         HStack{
@@ -174,5 +165,10 @@ struct CaloriesMacrosView: View {
 
 
 #Preview {
-    CaloriesMacrosView()
+    CaloriesMacrosView(
+        calories: 1500,
+        caloriesTarget: 2550,
+        macros: ["Carbs": 80, "Protein": 80, "Fat": 80, "Fiber": 80],
+        macrosTarget: ["Carbs": 200, "Protein": 200, "Fat": 200, "Fiber": 200]
+    )
 }

@@ -5,6 +5,7 @@ struct MealLogView: View {
 
     let onComplete: (MealEntry) -> Void
     let onCancel: () -> Void
+    var startsWithCamera: Bool = false
 
     @Environment(\.foodAnalysisService) private var foodAnalysisService
     @Environment(\.mealPhotoStorage) private var mealPhotoStorage
@@ -39,25 +40,26 @@ struct MealLogView: View {
         switch viewModel.step {
 
         case .capturing:
-            choiceScreen(viewModel: viewModel)
+            if startsWithCamera {
+                cameraCaptureScreen(viewModel: viewModel)
+            } else {
+                choiceScreen(viewModel: viewModel)
+            }
 
         case .analyzing(let image):
             analyzingView(image: image)
 
-        case .result(let items, let image):
+        case .result(let items):
             PhotoResultSummary(
-                meal: MealEntry(
-                    id: UUID(),
-                    timestamp: .now,
-                    photoRef: nil,
-                    items: items
-                ),
-                previewImage: image,
+                meal: viewModel.makeMealEntry(items: items),
                 onDone: {
-                    viewModel.confirmAndCommit(onComplete)
+                    let meal = viewModel.makeMealEntry(items: items)
+                    viewModel.logMeal(meal)
+                    onComplete(meal)
                 },
                 onDismiss: {
                     viewModel.retake()
+                    onCancel()
                 }
             )
 
@@ -66,9 +68,17 @@ struct MealLogView: View {
         }
     }
 
-    private func cancelFlow(using viewModel: MealLogViewModel) {
-        viewModel.cleanupUncommittedPhoto()
-        onCancel()
+    // MARK: - Camera-only capture (dashboard entry)
+
+    @ViewBuilder
+    private func cameraCaptureScreen(viewModel: MealLogViewModel) -> some View {
+        PhotoCaptureView(
+            onPhotoCaptured: { image in
+                viewModel.usePhoto(image)
+            },
+            onCancel: onCancel
+        )
+        .ignoresSafeArea()
     }
 
     // MARK: - Choice Screen
@@ -248,7 +258,7 @@ struct MealLogView: View {
     .fullScreenCover(isPresented: $showMealLog) {
         MealLogView(
             onComplete: { _ in showMealLog = false },
-            onCancel:   { showMealLog = false }
+            onCancel: { showMealLog = false }
         )
         .environment(\.foodAnalysisService, FoodAnalysisServiceMock())
         .environment(\.mealPhotoStorage, ImageProcessingService())
