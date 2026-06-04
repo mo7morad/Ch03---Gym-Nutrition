@@ -51,4 +51,21 @@ enum USDAQuerySanitizer {
     static func clampWeight(_ grams: Int) -> Int {
         min(max(grams, 5), 2000)
     }
+
+    /// Turns a USDA-style query ("rice, brown, cooked") into a readable label ("Cooked Brown Rice").
+    static func displayName(from raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return raw }
+
+        let parts = trimmed
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+
+        guard parts.count > 1 else {
+            return trimmed.localizedCapitalized
+        }
+
+        return parts.reversed().joined(separator: " ").localizedCapitalized
+    }
 }

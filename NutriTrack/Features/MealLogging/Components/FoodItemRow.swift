@@ -7,7 +7,7 @@ struct FoodItemRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(item.name)
+            Text(USDAQuerySanitizer.displayName(from: item.name))
                 .font(.headline)
 
             HStack(spacing: 12) {
