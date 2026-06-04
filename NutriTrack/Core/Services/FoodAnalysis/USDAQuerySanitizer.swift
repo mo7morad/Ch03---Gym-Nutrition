@@ -97,6 +97,11 @@ enum USDAQuerySanitizer {
             return !noise.contains(where: { lower.contains($0) })
         }
 
+        if parts[0].lowercased().contains("pepper"), modifiers.count >= 2 {
+            let descriptor = modifiers.prefix(2).reversed().joined(separator: " ")
+            return "\(descriptor) \(parts[0])".localizedCapitalized
+        }
+
         let words = ([parts[0]] + modifiers.prefix(2))
             .map { $0.localizedCapitalized }
             .joined(separator: " ")

@@ -60,7 +60,6 @@ struct PhotoResultSummary: View {
                     .ignoresSafeArea(edges: .bottom)
             }
         }
-        .clipped()
         .background(Color(hex: "F3F3F3"))
         .navigationTitle(meal.mealPeriodTitle)
         .navigationBarTitleDisplayMode(.inline)
