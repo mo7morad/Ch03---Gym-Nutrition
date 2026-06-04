@@ -13,6 +13,7 @@ struct MealListSectionView: View {
                 }
                 .padding(.vertical)
         }
+        .padding(.bottom, 30)
     }
 }
 

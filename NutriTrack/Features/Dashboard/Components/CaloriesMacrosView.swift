@@ -25,6 +25,21 @@ struct CaloriesMacrosView: View {
     ]
     
     var body: some View {
+        HStack{
+            VStack(alignment:.leading){
+                Text("Today's Fuel")
+                    .font(.system(size: 28, weight: .bold))
+                
+                Text(Date(), style: .date)
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(Color(hex: "181818"))
+                    .opacity(0.5)
+            }
+            .padding(.leading, 15)
+            .padding(.top, 20)
+            Spacer()
+        }
+        
         VStack{
             VStack{
                 
@@ -149,8 +164,9 @@ struct CaloriesMacrosView: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(hex: "E8E8E8"))
+                .frame(width: 369)
         )
-        .padding(.horizontal, 20) // outer margin from screen edges
+        .padding(.horizontal, 20)
                 
         }
     }
