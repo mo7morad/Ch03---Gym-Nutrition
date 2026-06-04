@@ -3,10 +3,11 @@ import PhotosUI
 
 struct MealLogView: View {
 
-    let onComplete: () -> Void
+    let onComplete: (MealEntry) -> Void
     let onCancel: () -> Void
 
     @Environment(\.foodAnalysisService) private var foodAnalysisService
+    @Environment(\.mealPhotoStorage) private var mealPhotoStorage
     @State private var viewModel: MealLogViewModel?
     @State private var showCamera = false
     @State private var selectedItem: PhotosPickerItem?
@@ -20,8 +21,14 @@ struct MealLogView: View {
         .animation(.easeInOut(duration: 0.25), value: viewModel?.step.id)
         .task {
             if viewModel == nil {
-                viewModel = MealLogViewModel(analysisService: foodAnalysisService)
+                viewModel = MealLogViewModel(
+                    analysisService: foodAnalysisService,
+                    photoStorage: mealPhotoStorage
+                )
             }
+        }
+        .onDisappear {
+            viewModel?.cleanupUncommittedPhoto()
         }
     }
 
@@ -37,14 +44,19 @@ struct MealLogView: View {
         case .analyzing(let image):
             analyzingView(image: image)
 
-        case .result(let items):
-            AnalysisResultView(
-                items: items,
-                onLog: {
-                    viewModel.logMeal()
-                    onComplete()
+        case .result(let items, let image):
+            PhotoResultSummary(
+                meal: MealEntry(
+                    id: UUID(),
+                    timestamp: .now,
+                    photoRef: nil,
+                    items: items
+                ),
+                previewImage: image,
+                onDone: {
+                    viewModel.confirmAndCommit(onComplete)
                 },
-                onRetake: {
+                onDismiss: {
                     viewModel.retake()
                 }
             )
@@ -52,6 +64,11 @@ struct MealLogView: View {
         case .failed(let image, let error):
             failedView(image: image, error: error, viewModel: viewModel)
         }
+    }
+
+    private func cancelFlow(using viewModel: MealLogViewModel) {
+        viewModel.cleanupUncommittedPhoto()
+        onCancel()
     }
 
     // MARK: - Choice Screen
@@ -113,7 +130,7 @@ struct MealLogView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        onCancel()
+                        cancelFlow(using: viewModel)
                     } label: {
                         Label("Close", systemImage: "xmark")
                     }
@@ -199,9 +216,9 @@ struct MealLogView: View {
                 .background(.ultraThinMaterial, in: Capsule())
 
                 Button {
-                    viewModel.retake()
+                    cancelFlow(using: viewModel)
                 } label: {
-                    Text("Retake Photo")
+                    Text("Cancel")
                         .fontWeight(.semibold)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 10)
@@ -230,8 +247,10 @@ struct MealLogView: View {
     }
     .fullScreenCover(isPresented: $showMealLog) {
         MealLogView(
-            onComplete: { showMealLog = false },
+            onComplete: { _ in showMealLog = false },
             onCancel:   { showMealLog = false }
         )
+        .environment(\.foodAnalysisService, FoodAnalysisServiceMock())
+        .environment(\.mealPhotoStorage, ImageProcessingService())
     }
 }

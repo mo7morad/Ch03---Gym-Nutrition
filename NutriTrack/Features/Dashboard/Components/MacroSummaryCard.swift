@@ -28,84 +28,73 @@ struct MacroSummaryCard: View{
     }
     
     var body : some View{
-        
-      ZStack{
-            RoundedRectangle(cornerRadius: 12)
-              .foregroundStyle(Color(hex: "E8E8E8"))
-              .frame(width: 369, height: 129)
-          
-          VStack (alignment: .leading, spacing: 9){
-              
-              HStack{
-                  Text(mealTitle)  //link the data
-                      .fontWeight(.semibold)
-                      .font(.system(size: 22))
-                  
-                  Spacer()
-                  
-                  Button{}label: {
-                      Image(systemName: "chevron.right.circle.fill")
-                          .resizable()
-                          .frame(width: 22, height: 22)
-                          .foregroundStyle(Color(hex: "181818"))
-                          .opacity(0.4)
-                  }
-                  
-              }
-              
-                  
-              
-              Text(itemsSummary)  //link the data
-                  .fontWeight(.regular)
-                  .font(.system(size: 12))
-                  .foregroundStyle(Color(hex: "181818"))
-                  .opacity(0.5)
-              
-              
-              Divider()
-            
-              HStack{
-                HStack(spacing: 3){
-                      Image(systemName: "flame")
-                          .resizable()
-                          .scaledToFill()
-                          .frame(width: 11, height: 11)
-                      
-                      Text(String(format: "%.0f kcal", meal.totalNutrition.calories)) //link the data
-                          .font(.system(size: 11))
-                  }
-                .fontWeight(.semibold)
-                .padding(.trailing, 15)
-                .foregroundStyle(Color(hex: "10937E"))
-                  
-                  HStack(spacing: 3){
-                      Image(systemName: "p.circle")
-                          .resizable()
-                          .scaledToFill()
-                          .frame(width: 12, height: 12)
-                          
-                      
-                      Text(String(format: "%.0fg", meal.totalNutrition.protein))
-                          .font(.system(size: 11))
-                          .font(.system(size: 11))
-                  }
-                  .foregroundStyle(Color(hex: "D16D8E"))
-                  .fontWeight(.semibold)
-                  
-                  
-                  Spacer()
-                  
-                  Text("09.25") //link the data
-                      .font(Font.system(size: 11))
-                      .foregroundStyle(Color(hex: "181818"))
-                      .opacity(0.5)
-              }
-              
-          }
-          .padding(.vertical, 21)
-          .padding(.horizontal, 36)
-          
+        HStack(spacing: 12) {
+            MealPhotoThumbnail(photoRef: meal.photoRef)
+
+            VStack(alignment: .leading, spacing: 9) {
+                HStack {
+                    Text(mealTitle)
+                        .fontWeight(.semibold)
+                        .font(.system(size: 22))
+
+                    Spacer()
+
+                    Button {} label: {
+                        Image(systemName: "chevron.right.circle.fill")
+                            .resizable()
+                            .frame(width: 22, height: 22)
+                            .foregroundStyle(Color(hex: "181818"))
+                            .opacity(0.4)
+                    }
+                }
+
+                Text(itemsSummary)
+                    .fontWeight(.regular)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color(hex: "181818"))
+                    .opacity(0.5)
+
+                Divider()
+
+                HStack {
+                    HStack(spacing: 3) {
+                        Image(systemName: "flame")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 11, height: 11)
+
+                        Text(String(format: "%.0f kcal", meal.totalNutrition.calories))
+                            .font(.system(size: 11))
+                    }
+                    .fontWeight(.semibold)
+                    .padding(.trailing, 15)
+                    .foregroundStyle(Color(hex: "10937E"))
+
+                    HStack(spacing: 3) {
+                        Image(systemName: "p.circle")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 12, height: 12)
+
+                        Text(String(format: "%.0fg", meal.totalNutrition.protein))
+                            .font(.system(size: 11))
+                    }
+                    .foregroundStyle(Color(hex: "D16D8E"))
+                    .fontWeight(.semibold)
+
+                    Spacer()
+
+                    Text(timeString)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color(hex: "181818"))
+                        .opacity(0.5)
+                }
+            }
         }
+        .padding(.vertical, 16)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(hex: "E8E8E8"), in: RoundedRectangle(cornerRadius: 12))
     }
 }
 
