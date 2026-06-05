@@ -41,14 +41,14 @@ extension FoodAnalysisServiceLive {
         let groqAPIKey = loadSecret("GROQ_API_KEY", placeholder: "YOUR_GROQ_API_KEY")
 
         let geminiClient = GeminiVisionClient(apiKey: geminiAPIKey)
-        let groqClient: GroqVisionClient? = groqAPIKey != "YOUR_GROQ_API_KEY"
-            ? GroqVisionClient(apiKey: groqAPIKey)
-            : nil
+        let groqClient = GroqVisionClient(apiKey: groqAPIKey)
 
-        let visionClient = FallbackVisionClient(
-            primary: geminiClient,
-            fallback: groqClient
-        )
+        let visionClient: any FoodVisionIdentifying
+        if groqAPIKey != "YOUR_GROQ_API_KEY" {
+            visionClient = FallbackVisionClient(primary: groqClient, fallback: geminiClient)
+        } else {
+            visionClient = geminiClient
+        }
 
         return FoodAnalysisServiceLive(
             visionClient: visionClient,
