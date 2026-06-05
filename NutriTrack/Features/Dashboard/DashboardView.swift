@@ -5,6 +5,8 @@ struct DashboardView: View {
     @Query private var profiles: [UserProfile]
     
     @State private var toggleStreak: Bool = false
+    @State private var toggleSettings: Bool = false
+
     @State private var mealLogPresentation: MealLogPresentation?
     @State private var dailyMeals: [MealEntry] = []
     
@@ -87,7 +89,11 @@ struct DashboardView: View {
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Image(systemName: "person.fill")
+                    Button{
+                        toggleSettings.toggle()
+                    }label:{
+                        Image(systemName: "person.fill")
+                    }
                 }
                 
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -204,6 +210,9 @@ struct DashboardView: View {
             }
             .onTapGesture{
                 if(toggleStreak){withAnimation(.spring()) {toggleStreak.toggle()}}
+            }
+            .sheet(isPresented: $toggleSettings){
+                Settings()
             }
             .background(Color(hex: "F3F3F3"))
         }
