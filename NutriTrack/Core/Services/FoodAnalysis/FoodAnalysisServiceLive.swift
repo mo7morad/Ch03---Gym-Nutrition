@@ -44,20 +44,55 @@ extension FoodAnalysisServiceLive {
         let usdaAPIKey = loadSecret("USDA_API_KEY", placeholder: "YOUR_USDA_API_KEY")
         let groqAPIKey = loadSecret("GROQ_API_KEY", placeholder: "YOUR_GROQ_API_KEY")
 
+        let geminiKeyValid = geminiAPIKey != "YOUR_GEMINI_API_KEY"
+        let groqKeyValid = groqAPIKey != "YOUR_GROQ_API_KEY"
+
         let geminiClient = GeminiVisionClient(apiKey: geminiAPIKey)
         let groqClient = GroqVisionClient(apiKey: groqAPIKey)
 
-        let visionClient: any FoodVisionIdentifying
-        if groqAPIKey != "YOUR_GROQ_API_KEY" {
-            visionClient = FallbackVisionClient(primary: groqClient, fallback: geminiClient)
-        } else {
-            visionClient = geminiClient
-        }
+        let visionClient = makeVisionClient(
+            gemini: geminiClient,
+            groq: groqClient,
+            geminiKeyValid: geminiKeyValid,
+            groqKeyValid: groqKeyValid
+        )
 
         return FoodAnalysisServiceLive(
             visionClient: visionClient,
             nutritionClient: USDANutritionClient(apiKey: usdaAPIKey)
         )
+    }
+
+    private static func makeVisionClient(
+        gemini: GeminiVisionClient,
+        groq: GroqVisionClient,
+        geminiKeyValid: Bool,
+        groqKeyValid: Bool
+    ) -> any FoodVisionIdentifying {
+        let preferredPrimary = VisionProviderConfiguration.primary
+        let primary: any FoodVisionIdentifying
+        let fallback: (any FoodVisionIdentifying)?
+
+        switch preferredPrimary {
+        case .gemini:
+            primary = gemini
+            fallback = groqKeyValid ? groq : nil
+        case .groq:
+            primary = groq
+            fallback = geminiKeyValid ? gemini : nil
+        }
+
+        let primaryKeyValid = preferredPrimary == .gemini ? geminiKeyValid : groqKeyValid
+        if primaryKeyValid, let fallback {
+            return FallbackVisionClient(primary: primary, fallback: fallback)
+        }
+        if primaryKeyValid {
+            return primary
+        }
+        if let fallback {
+            return fallback
+        }
+        return primary
     }
 
     /// Loads a secret from `Secrets.plist` in the app bundle.
