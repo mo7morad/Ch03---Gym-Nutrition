@@ -32,15 +32,11 @@ struct PhotoResultSummary: View {
                 VStack(alignment: .leading, spacing: 20) {
                     mealPhotoView
 
-                    Text(meal.mealHeadline)
-                        .font(.system(size: 22, weight: .semibold))
-                        .foregroundStyle(Color(hex: "181818"))
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    mealTitleSection
 
                     macroGrid
 
-                    if context == .loggedMeal {
+                    if context == .loggedMeal, ingredientsSubtitle == nil {
                         ingredientsSection
                     }
 
@@ -82,6 +78,38 @@ struct PhotoResultSummary: View {
         } else {
             onDismiss()
         }
+    }
+
+    // MARK: - Title
+
+    private var mealTitleSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(meal.mealHeadline)
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(Color(hex: "181818"))
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            if let ingredientsSubtitle {
+                Text(ingredientsSubtitle)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color(hex: "181818"))
+                    .opacity(0.5)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    /// Comma-separated foods shown under the AI meal name.
+    private var ingredientsSubtitle: String? {
+        let label = meal.ingredientsLabel
+        guard label != "No ingredients" else { return nil }
+
+        let hasAIMealName = !(meal.mealName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+        guard hasAIMealName else { return nil }
+
+        return label
     }
 
     // MARK: - Photo
@@ -199,6 +227,7 @@ struct PhotoResultSummary: View {
             id: UUID(),
             timestamp: Date(),
             photoRef: nil,
+            mealName: "Chicken and Rice Bowl",
             items: [
                 FoodItem(
                     id: UUID(),

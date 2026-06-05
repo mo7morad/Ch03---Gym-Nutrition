@@ -6,6 +6,7 @@ struct MealEntry: Identifiable {
     let id: UUID
     var timestamp: Date
     var photoRef: String?
+    var mealName: String?
     var items: [FoodItem]
 
     var totalNutrition: NutritionInfo {

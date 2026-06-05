@@ -108,6 +108,7 @@ struct MacroSummaryCard: View {
             id: UUID(),
             timestamp: Date(),
             photoRef: nil,
+            mealName: nil,
             items: [mockItem1, mockItem2]
         )
     )

@@ -4,5 +4,6 @@ import Foundation
 
 /// JSON wrapper returned by vision models.
 struct IdentifiedFoodList: Decodable {
+    let mealName: String?
     let items: [IdentifiedFood]
 }

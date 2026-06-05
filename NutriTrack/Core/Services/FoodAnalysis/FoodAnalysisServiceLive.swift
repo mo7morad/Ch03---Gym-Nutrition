@@ -15,20 +15,24 @@ final class FoodAnalysisServiceLive: FoodAnalysisService, @unchecked Sendable {
         self.nutritionClient = nutritionClient
     }
 
-    func analyze(image: UIImage) async throws -> [NutritionInfo] {
-        let identifiedFoods = try await visionClient.identify(image: image)
+    func analyze(image: UIImage) async throws -> MealAnalysisResult {
+        let identification = try await visionClient.identify(image: image)
 
-        guard !identifiedFoods.isEmpty else {
-            return []
+        guard !identification.items.isEmpty else {
+            return MealAnalysisResult(mealName: identification.mealName ?? "", items: [])
         }
 
-        let lookupItems = identifiedFoods.map { food in
+        let lookupItems = identification.items.map { food in
             (
                 name: food.name,
                 weightGrams: USDAQuerySanitizer.clampWeight(food.estimatedWeightGrams)
             )
         }
-        return try await nutritionClient.lookup(foods: lookupItems)
+        let nutritionItems = try await nutritionClient.lookup(foods: lookupItems)
+        return MealAnalysisResult(
+            mealName: identification.mealName ?? "",
+            items: nutritionItems
+        )
     }
 }
 

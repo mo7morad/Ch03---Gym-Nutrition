@@ -9,11 +9,11 @@ import UIKit
 /// Contract for food photo analysis.
 /// ViewModels depend on this protocol, never on a concrete type.
 protocol FoodAnalysisService {
-    /// Analyzes a photo and returns nutrition info for each identified food item.
+    /// Analyzes a photo and returns a meal name plus nutrition info per identified food item.
     /// - Parameter image: The photo captured by the user.
-    /// - Returns: Array of `NutritionInfo`, one per identified food item.
+    /// - Returns: `MealAnalysisResult` with display meal name and per-item nutrition.
     /// - Throws: Any error from the underlying vision or nutrition API.
-    func analyze(image: UIImage) async throws -> [NutritionInfo]
+    func analyze(image: UIImage) async throws -> MealAnalysisResult
 }
 
 // MARK: - SwiftUI Environment Wiring

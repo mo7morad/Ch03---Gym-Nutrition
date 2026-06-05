@@ -46,13 +46,13 @@ struct MealLogView: View {
         case .analyzing(let image):
             analyzingView(image: image)
 
-        case .result(let items):
+        case .result(let mealName, let items):
             NavigationStack {
                 PhotoResultSummary(
-                    meal: viewModel.makeMealEntry(items: items),
+                    meal: viewModel.makeMealEntry(mealName: mealName, items: items),
                     context: .newMeal,
                     onDone: {
-                        let meal = viewModel.makeMealEntry(items: items)
+                        let meal = viewModel.makeMealEntry(mealName: mealName, items: items)
                         viewModel.logMeal(meal)
                         onComplete(meal)
                     },

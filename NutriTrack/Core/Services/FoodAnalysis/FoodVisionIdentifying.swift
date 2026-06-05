@@ -3,5 +3,5 @@
 import UIKit
 
 protocol FoodVisionIdentifying: Sendable {
-    func identify(image: UIImage) async throws -> [IdentifiedFood]
+    func identify(image: UIImage) async throws -> MealIdentificationResult
 }

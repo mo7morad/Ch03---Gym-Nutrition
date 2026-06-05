@@ -31,12 +31,14 @@ struct MealListSectionView: View {
         id: UUID(),
         timestamp: Date(),
         photoRef: nil,
+        mealName: "Fried Rice and Egg",
         items: [mockItem1, mockItem2]
     )
     let mockMeal2 = MealEntry(
         id: UUID(),
         timestamp: Date().addingTimeInterval(14400),
         photoRef: nil,
+        mealName: nil,
         items: [mockItem1]
     )
     

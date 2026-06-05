@@ -80,7 +80,7 @@ struct GroqVisionClient: FoodVisionIdentifying, Sendable {
         self.session = session
     }
 
-    func identify(image: UIImage) async throws -> [IdentifiedFood] {
+    func identify(image: UIImage) async throws -> MealIdentificationResult {
         let imageData: Data
         do {
             imageData = try VisionImageEncoder.jpegDataForGroq(from: image)
@@ -113,8 +113,7 @@ struct GroqVisionClient: FoodVisionIdentifying, Sendable {
             throw GroqVisionError.httpError(statusCode: httpResponse.statusCode)
         }
 
-        let items = try parseResponse(data: data)
-        return IdentifiedFoodNormalizer.normalizeForUSDA(items)
+        return try parseResponse(data: data)
     }
 
     private func buildRequest(base64Image: String) -> GroqChatRequest {
@@ -139,7 +138,7 @@ struct GroqVisionClient: FoodVisionIdentifying, Sendable {
         )
     }
 
-    private func parseResponse(data: Data) throws -> [IdentifiedFood] {
+    private func parseResponse(data: Data) throws -> MealIdentificationResult {
         let groqResponse: GroqChatResponse
         do {
             groqResponse = try JSONDecoder().decode(GroqChatResponse.self, from: data)
@@ -154,14 +153,11 @@ struct GroqVisionClient: FoodVisionIdentifying, Sendable {
             throw GroqVisionError.emptyResponse
         }
 
-        let foodList: IdentifiedFoodList
         do {
-            foodList = try JSONDecoder().decode(IdentifiedFoodList.self, from: jsonData)
-        } catch {
+            return try VisionIdentificationParser.parse(jsonData: jsonData)
+        } catch VisionIdentificationParseError.malformedJSON {
             throw GroqVisionError.malformedJSON
         }
-
-        return foodList.items
     }
 }
 

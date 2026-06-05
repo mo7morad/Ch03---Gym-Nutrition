@@ -7,7 +7,7 @@ struct AnalysisResultView: View {
     let onRetake: () -> Void
 
     private var total: NutritionInfo {
-        MealEntry(id: UUID(), timestamp: .now, photoRef: nil, items: items).totalNutrition
+        MealEntry(id: UUID(), timestamp: .now, photoRef: nil, mealName: nil, items: items).totalNutrition
     }
 
     var body: some View {

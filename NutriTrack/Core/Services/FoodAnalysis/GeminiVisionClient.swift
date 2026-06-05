@@ -68,7 +68,7 @@ struct GeminiVisionClient: FoodVisionIdentifying, Sendable {
         self.session = session
     }
 
-    func identify(image: UIImage) async throws -> [IdentifiedFood] {
+    func identify(image: UIImage) async throws -> MealIdentificationResult {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             throw GeminiVisionError.imageEncodingFailed
         }
@@ -92,8 +92,7 @@ struct GeminiVisionClient: FoodVisionIdentifying, Sendable {
             throw GeminiVisionError.httpError(statusCode: httpResponse.statusCode)
         }
 
-        let items = try parseResponse(data: data)
-        return IdentifiedFoodNormalizer.normalizeForUSDA(items)
+        return try parseResponse(data: data)
     }
 
     // MARK: - Private Helpers
@@ -126,7 +125,7 @@ struct GeminiVisionClient: FoodVisionIdentifying, Sendable {
         )
     }
 
-    private func parseResponse(data: Data) throws -> [IdentifiedFood] {
+    private func parseResponse(data: Data) throws -> MealIdentificationResult {
         let geminiResponse: GeminiResponse
         do {
             geminiResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
@@ -141,14 +140,11 @@ struct GeminiVisionClient: FoodVisionIdentifying, Sendable {
             throw GeminiVisionError.emptyResponse
         }
 
-        let foodList: IdentifiedFoodList
         do {
-            foodList = try JSONDecoder().decode(IdentifiedFoodList.self, from: jsonData)
-        } catch {
+            return try VisionIdentificationParser.parse(jsonData: jsonData)
+        } catch VisionIdentificationParseError.malformedJSON {
             throw GeminiVisionError.malformedJSON
         }
-
-        return foodList.items
     }
 }
 

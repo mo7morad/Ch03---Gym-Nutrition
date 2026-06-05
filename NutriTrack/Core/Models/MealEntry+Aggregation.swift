@@ -24,6 +24,9 @@ extension MealEntry {
 
     /// Short title for the meal detail screen; full items live under Ingredients.
     var mealHeadline: String {
+        let trimmed = mealName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !trimmed.isEmpty { return trimmed }
+
         let names = itemDisplayNames
         guard let first = names.first else { return "Unknown Meal" }
         if names.count == 1 { return first }

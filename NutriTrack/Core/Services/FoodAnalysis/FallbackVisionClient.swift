@@ -12,7 +12,7 @@ struct FallbackVisionClient: FoodVisionIdentifying, Sendable {
         self.fallback = fallback
     }
 
-    func identify(image: UIImage) async throws -> [IdentifiedFood] {
+    func identify(image: UIImage) async throws -> MealIdentificationResult {
         do {
             return try await primary.identify(image: image)
         } catch {

@@ -10,7 +10,7 @@ final class MealLogViewModel {
     enum Step {
         case capturing
         case analyzing(UIImage)
-        case result([FoodItem])
+        case result(mealName: String, items: [FoodItem])
         case failed(UIImage, Error)
     }
 
@@ -36,22 +36,24 @@ final class MealLogViewModel {
 
         Task {
             do {
-                let nutritionInfos = try await analysisService.analyze(image: image)
-                let foodItems = nutritionInfos.map {
+                let analysisResult = try await analysisService.analyze(image: image)
+                let foodItems = analysisResult.items.map {
                     FoodItem(id: UUID(), name: $0.foodName, nutrition: $0)
                 }
-                step = .result(foodItems)
+                step = .result(mealName: analysisResult.mealName, items: foodItems)
             } catch {
                 step = .failed(image, error)
             }
         }
     }
 
-    func makeMealEntry(items: [FoodItem]) -> MealEntry {
-        MealEntry(
+    func makeMealEntry(mealName: String, items: [FoodItem]) -> MealEntry {
+        let trimmed = mealName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return MealEntry(
             id: UUID(),
             timestamp: .now,
             photoRef: savedPhotoRef,
+            mealName: trimmed.isEmpty ? nil : trimmed,
             items: items
         )
     }
