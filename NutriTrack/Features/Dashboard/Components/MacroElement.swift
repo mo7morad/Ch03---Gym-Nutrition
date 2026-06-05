@@ -54,6 +54,9 @@ struct MacroElement: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.white)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(macrotype)")
+        .accessibilityValue("\(progress) of \(target) grams consumed, \(remaining) grams remaining")
     }
 
     private var macroProgressBar: some View {
@@ -68,5 +71,11 @@ struct MacroElement: View {
             }
         }
         .frame(height: 8)
+        .accessibilityProgress(
+            label: "\(macrotype) progress",
+            current: progress,
+            target: target,
+            unit: "grams"
+        )
     }
 }

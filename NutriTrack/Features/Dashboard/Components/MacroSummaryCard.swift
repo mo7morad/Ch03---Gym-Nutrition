@@ -28,6 +28,7 @@ struct MacroSummaryCard: View {
                     .font(.system(size: 22))
                     .foregroundStyle(Color(hex: "181818"))
                     .opacity(0.4)
+                    .accessibilityDecorative()
             }
 
             Text(itemsSummary)
@@ -46,6 +47,7 @@ struct MacroSummaryCard: View {
                     Text(String(format: "%.0f kcal", meal.totalNutrition.calories))
                 } icon: {
                     Image(systemName: "flame.fill")
+                        .accessibilityDecorative()
                 }
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color(hex: "10937E"))
@@ -54,6 +56,7 @@ struct MacroSummaryCard: View {
                     Text(String(format: "%.0fg", meal.totalNutrition.protein))
                 } icon: {
                     Image(systemName: "p.circle.fill")
+                        .accessibilityDecorative()
                 }
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color(hex: "D16D8E"))
@@ -72,6 +75,14 @@ struct MacroSummaryCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(hex: "E8E8E8"))
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(meal.mealPeriodTitle), \(itemsSummary)")
+        .accessibilityValue(
+            "\(Int(meal.totalNutrition.calories.rounded())) calories, "
+            + "\(Int(meal.totalNutrition.protein.rounded())) grams protein, "
+            + "logged at \(timeString)"
+        )
+        .accessibilityHint("Shows meal details")
     }
 }
 

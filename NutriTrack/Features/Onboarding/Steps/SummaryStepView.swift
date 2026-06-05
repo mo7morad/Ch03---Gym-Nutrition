@@ -10,6 +10,7 @@ struct SummaryStepView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Your daily targets")
                     .font(.title2).bold()
+                    .accessibilityAddTraits(.isHeader)
                 Text("Based on your profile and goal.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -74,6 +75,7 @@ struct SummaryStepView: View {
             }
             .buttonStyle(.borderedProminent)
             .disabled(viewModel.isSaving)
+            .accessibilityLabel(viewModel.isSaving ? "Saving your plan" : "Let's Go")
         }
         .padding(.horizontal, 20)
     }

@@ -1,38 +1,33 @@
 import SwiftUI
 
-/// Mascot peeking in from the bottom-left with a speech-style confirmation message.
+/// Mascot image peeking in from the bottom-left corner with a speech-style confirmation message.
 struct MealLoggedConfirmationView: View {
-    private let mascotAspectRatio: CGFloat = 319 / 192
-    private let mascotRotation: Double = 13
-    private let mascotWidth: CGFloat = 300
+    /// Space so scroll content clears the visible part of the mascot footer.
+    static let scrollBottomInset: CGFloat = 152
 
-    /// Space so scroll content clears the mascot footer.
-    static let scrollBottomInset: CGFloat = 168
+    private let mascotWidth: CGFloat = 360
+    /// Shifts the image off the leading and bottom edges so it looks like it pops out of the corner.
+    private let mascotPeekOffset = CGSize(width: -96, height: 72)
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            mascot
+            Image("MealLoggedMascot")
+                .resizable()
+                .scaledToFit()
+                .frame(width: mascotWidth)
+                .offset(mascotPeekOffset)
+                .accessibilityDecorative()
 
             messageCluster
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: Self.scrollBottomInset, alignment: .bottomLeading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
         .allowsHitTesting(false)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Your meal is logged!")
     }
 
-    private var mascot: some View {
-        Image("MealLoggedMascot")
-            .resizable()
-            .scaledToFit()
-            .frame(width: mascotWidth, height: mascotWidth / mascotAspectRatio)
-            .rotationEffect(.degrees(mascotRotation))
-            .offset(x: -32, y: 52)
-    }
-
     private var messageCluster: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Your meal is logged!")
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(Color(hex: "181818"))
@@ -42,8 +37,8 @@ struct MealLoggedConfirmationView: View {
                 .frame(width: 104, height: 52)
                 .offset(x: -12, y: 0)
         }
-        .padding(.leading, 192)
-        .padding(.bottom, 62)
+        .padding(.leading, 176)
+        .padding(.bottom, 96)
     }
 }
 
@@ -61,9 +56,10 @@ private struct MealLoggedSpeechConnector: Shape {
 }
 
 #Preview {
-    ZStack(alignment: .bottom) {
+    ZStack(alignment: .bottomLeading) {
         Color(hex: "F3F3F3").ignoresSafeArea()
         MealLoggedConfirmationView()
-            .ignoresSafeArea(edges: .bottom)
+            .ignoresSafeArea(edges: [.bottom, .leading])
     }
+    .clipped()
 }

@@ -22,5 +22,8 @@ struct StepProgressBar: View {
                     .animation(.easeInOut, value: stepIndex)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Onboarding progress")
+        .accessibilityValue("Step \(stepIndex + 1) of 3")
     }
 }

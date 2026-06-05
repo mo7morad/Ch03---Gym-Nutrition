@@ -10,6 +10,7 @@ struct GoalSelectionStepView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("What's your goal?")
                     .font(.title2).bold()
+                    .accessibilityAddTraits(.isHeader)
                 Text("This adjusts your daily calorie target.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)

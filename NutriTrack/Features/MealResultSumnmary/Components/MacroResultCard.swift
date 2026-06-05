@@ -23,6 +23,7 @@ struct MacroResultCard: View {
             HStack(spacing: 4) {
                 Image(systemName: iconName)
                     .foregroundStyle(themeColor)
+                    .accessibilityDecorative()
 
                 Text(title)
                     .foregroundStyle(.secondary)

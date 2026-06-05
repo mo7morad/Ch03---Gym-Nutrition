@@ -114,6 +114,7 @@ struct MealLogView: View {
                     VStack(spacing: 16) {
                         Text("Add Your Meal")
                             .font(.title.weight(.bold))
+                            .accessibilityAddTraits(.isHeader)
 
                         Text("Take a photo or pick one from your library")
                             .font(.subheadline)
@@ -209,6 +210,7 @@ struct MealLogView: View {
                 .scaledToFit()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(.ultraThinMaterial)
+                .accessibilityDecorative()
 
             VStack(spacing: 16) {
                 ProgressView()
@@ -218,7 +220,10 @@ struct MealLogView: View {
                     .font(.headline)
                     .foregroundStyle(.white)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Analyzing your meal")
         }
+        .accessibilityElement(children: .contain)
     }
 
     // MARK: - Failed
@@ -233,6 +238,7 @@ struct MealLogView: View {
                 .scaledToFit()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(.ultraThinMaterial)
+                .accessibilityDecorative()
 
             VStack(spacing: 16) {
                 Text(error.localizedDescription)
@@ -261,7 +267,9 @@ struct MealLogView: View {
                 .background(.ultraThinMaterial, in: Capsule())
             }
             .padding(32)
+            .accessibilityElement(children: .contain)
         }
+        .accessibilityElement(children: .contain)
     }
 }
 

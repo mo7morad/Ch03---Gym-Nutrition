@@ -44,6 +44,7 @@ struct DashboardView: View {
                         .resizable()
                         .frame(width: 220, height: 150)
                         .padding(.top, 40)
+                        .accessibilityDecorative()
 
                     CaloriesMacrosView(
                         calories: Int(consumedToday.calories.rounded()),
@@ -72,16 +73,14 @@ struct DashboardView: View {
                             toggleStreak.toggle()
                         }
                     } label: {
-                        HStack {
-                            Image(systemName: "flame")
-                        }
+                        Label("1 day streak", systemImage: "flame")
                     }
-                    Text("1")
-                        .offset(x: -12)
+                    .accessibilityHint(toggleStreak ? "Double tap to hide weekly streak" : "Double tap to show weekly streak")
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Image(systemName: "person.fill")
+                        .accessibilityLabel("Profile")
                 }
 
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -161,6 +160,8 @@ struct DashboardView: View {
                             .combined(with: .scale)
                             .combined(with: .opacity)
                     )
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Weekly streak, 1 day")
                 }
             }
             .fullScreenCover(item: $mealLogPresentation) { presentation in

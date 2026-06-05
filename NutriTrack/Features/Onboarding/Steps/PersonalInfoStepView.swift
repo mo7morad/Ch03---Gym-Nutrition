@@ -16,6 +16,7 @@ struct PersonalInfoStepView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Let's get to know you")
                         .font(.title2).bold()
+                        .accessibilityAddTraits(.isHeader)
                         // TODO: replace with DesignSystem token
                     Text("We'll use this to calculate your daily nutrition targets.")
                         .font(.subheadline)

@@ -57,9 +57,10 @@ struct PhotoResultSummary: View {
 
             if context == .loggedMeal {
                 MealLoggedConfirmationView()
-                    .ignoresSafeArea(edges: .bottom)
+                    .ignoresSafeArea(edges: [.bottom, .leading])
             }
         }
+        .clipped()
         .background(Color(hex: "F3F3F3"))
         .preferredColorScheme(.light)
         .navigationTitle(meal.mealPeriodTitle)
@@ -72,6 +73,7 @@ struct PhotoResultSummary: View {
                         .fontWeight(.semibold)
                         .foregroundStyle(Color(hex: "181818"))
                 }
+                .accessibilityLabel(context == .loggedMeal ? "Back" : "Close")
             }
         }
     }
@@ -108,6 +110,7 @@ struct PhotoResultSummary: View {
         .frame(height: photoHeight)
         .clipped()
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .accessibilityLabel(meal.photoRef == nil ? "Meal photo placeholder" : "Meal photo")
     }
 
     // MARK: - Macros
@@ -169,6 +172,7 @@ struct PhotoResultSummary: View {
             Text("Ingredients")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Color(hex: "181818"))
+                .accessibilityAddTraits(.isHeader)
 
             Text(meal.ingredientsLabel)
                 .font(.system(size: 14))
@@ -190,6 +194,8 @@ struct PhotoResultSummary: View {
                 .frame(height: 52)
                 .background(.black, in: RoundedRectangle(cornerRadius: 50))
         }
+        .accessibilityLabel("Done")
+        .accessibilityHint("Logs this meal")
     }
 }
 

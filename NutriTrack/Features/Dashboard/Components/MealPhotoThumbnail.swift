@@ -23,6 +23,7 @@ struct MealPhotoThumbnail: View {
         .frame(width: size, height: size)
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .accessibilityLabel(photoRef == nil ? "Meal placeholder" : "Meal photo")
+        .accessibilityAddTraits(.isImage)
     }
 }
 

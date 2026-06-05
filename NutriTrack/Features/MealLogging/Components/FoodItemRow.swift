@@ -19,6 +19,12 @@ struct FoodItemRow: View {
             .font(.caption)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            "\(USDAQuerySanitizer.displayName(from: item.name)), "
+            + "\(Int(item.nutrition.calories)) calories, "
+            + "\(Int(item.nutrition.protein)) grams protein"
+        )
     }
 }
 

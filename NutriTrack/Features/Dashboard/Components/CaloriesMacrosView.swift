@@ -50,6 +50,8 @@ struct CaloriesMacrosView: View {
                 .opacity(0.5)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
     }
 
     // MARK: - Main card
@@ -93,6 +95,8 @@ struct CaloriesMacrosView: View {
                         .opacity(0.4)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
+                .accessibilityLabel(isExpanded ? "Hide macro details" : "Show macro details")
+                .accessibilityHint("Double tap to toggle")
             }
 
             Text("\(calories) / \(caloriesTarget)")
@@ -111,7 +115,14 @@ struct CaloriesMacrosView: View {
                 }
             }
             .frame(height: 12)
+            .accessibilityProgress(
+                label: "Calories consumed",
+                current: calories,
+                target: caloriesTarget,
+                unit: "calories"
+            )
         }
+        .accessibilityElement(children: .contain)
     }
 
     private var macroGrid: some View {

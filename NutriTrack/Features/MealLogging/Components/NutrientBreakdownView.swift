@@ -32,6 +32,8 @@ private struct NutrientLine: View {
             Text(value)
                 .bold()
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label), \(value)")
     }
 }
 

@@ -29,6 +29,8 @@ struct MacroRow: View {
                 // TODO: replace with DesignSystem token
                 .fill(Color(.secondarySystemBackground))
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label), \(value) \(unit)")
     }
 }
 

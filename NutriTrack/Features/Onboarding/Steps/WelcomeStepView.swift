@@ -33,6 +33,7 @@ struct WelcomeStepView: View {
             VStack(spacing: 10) {
                 Text("NutriTrack")
                     .font(.largeTitle).bold()
+                    .accessibilityAddTraits(.isHeader)
                     // TODO: replace with DesignSystem token
 
                 Text("Tell us about yourself and we'll build\nyour personal nutrition plan.")
