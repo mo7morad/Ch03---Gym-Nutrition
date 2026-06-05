@@ -3,19 +3,7 @@
 import Foundation
 import UIKit
 
-// MARK: - Public Types
-
-/// A food item identified by Gemini with an estimated gram weight.
-struct GeminiIdentifiedFood: Decodable, Sendable {
-    let name: String
-    let estimatedWeightGrams: Int
-}
-
 // MARK: - Private Request/Response Models
-
-private struct GeminiIdentifiedFoodList: Decodable {
-    let items: [GeminiIdentifiedFood]
-}
 
 private struct GeminiRequest: Encodable {
     let contents: [Content]
@@ -71,7 +59,7 @@ private struct GeminiResponse: Decodable {
 // MARK: - Client
 
 /// Sends an image to Gemini Flash and returns identified food items with gram weights.
-struct GeminiVisionClient: Sendable {
+struct GeminiVisionClient: FoodVisionIdentifying, Sendable {
     private let apiKey: String
     private let session: URLSession
 
@@ -80,7 +68,7 @@ struct GeminiVisionClient: Sendable {
         self.session = session
     }
 
-    func identify(image: UIImage) async throws -> [GeminiIdentifiedFood] {
+    func identify(image: UIImage) async throws -> [IdentifiedFood] {
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             throw GeminiVisionError.imageEncodingFailed
         }
@@ -105,7 +93,7 @@ struct GeminiVisionClient: Sendable {
         }
 
         let items = try parseResponse(data: data)
-        return normalizeForUSDA(items)
+        return IdentifiedFoodNormalizer.normalizeForUSDA(items)
     }
 
     // MARK: - Private Helpers
@@ -124,31 +112,10 @@ struct GeminiVisionClient: Sendable {
     }
 
     private func buildRequest(base64Image: String) -> GeminiRequest {
-        let prompt = """
-        Identify distinct foods in this meal photo for the USDA FoodData Central API \
-        (Foundation Foods and SR Legacy datasets only — not branded packaged products).
-
-        Output rules for "name" (this string is sent verbatim as the USDA search query):
-        - Use short generic English in SR Legacy style: "food, detail, preparation".
-        - Examples: "rice, brown, cooked", "chicken, breast, grilled", "broccoli, cooked", "egg, whole, cooked".
-        - Do NOT use brand names, restaurant names, menu titles, or compound dish names \
-        (avoid "caesar salad", "chicken sandwich", "pasta carbonara").
-        - Decompose plates into separate simple ingredients when visible.
-        - Lowercase only. Use commas between descriptors. No other punctuation.
-        - Maximum 8 words per name. Letters, commas, and spaces only.
-        - Prefer the most common USDA commodity term when unsure.
-
-        Rules for "estimatedWeightGrams":
-        - Integer grams of edible portion visible (not cups, slices, or servings). Range 5–2000.
-
-        Return at most 8 items. Return ONLY valid JSON, no markdown:
-        {"items":[{"name":"chicken, breast, grilled","estimatedWeightGrams":150}]}
-        """
-
-        return GeminiRequest(
+        GeminiRequest(
             contents: [
                 .init(parts: [
-                    .init(text: prompt),
+                    .init(text: VisionFoodIdentificationPrompt.prompt),
                     .init(inlineData: .init(mimeType: "image/jpeg", data: base64Image))
                 ])
             ],
@@ -159,7 +126,7 @@ struct GeminiVisionClient: Sendable {
         )
     }
 
-    private func parseResponse(data: Data) throws -> [GeminiIdentifiedFood] {
+    private func parseResponse(data: Data) throws -> [IdentifiedFood] {
         let geminiResponse: GeminiResponse
         do {
             geminiResponse = try JSONDecoder().decode(GeminiResponse.self, from: data)
@@ -174,26 +141,14 @@ struct GeminiVisionClient: Sendable {
             throw GeminiVisionError.emptyResponse
         }
 
-        let foodList: GeminiIdentifiedFoodList
+        let foodList: IdentifiedFoodList
         do {
-            foodList = try JSONDecoder().decode(GeminiIdentifiedFoodList.self, from: jsonData)
+            foodList = try JSONDecoder().decode(IdentifiedFoodList.self, from: jsonData)
         } catch {
             throw GeminiVisionError.malformedJSON
         }
 
         return foodList.items
-    }
-
-    /// Applies USDA query sanitization and safe gram bounds before network lookup.
-    private func normalizeForUSDA(_ items: [GeminiIdentifiedFood]) -> [GeminiIdentifiedFood] {
-        items.compactMap { item in
-            let query = USDAQuerySanitizer.sanitize(item.name)
-            guard !query.isEmpty else { return nil }
-            return GeminiIdentifiedFood(
-                name: query,
-                estimatedWeightGrams: USDAQuerySanitizer.clampWeight(item.estimatedWeightGrams)
-            )
-        }
     }
 }
 

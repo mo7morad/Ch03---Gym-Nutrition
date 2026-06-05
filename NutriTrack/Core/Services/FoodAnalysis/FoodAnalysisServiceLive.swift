@@ -7,10 +7,10 @@ import UIKit
 
 final class FoodAnalysisServiceLive: FoodAnalysisService, @unchecked Sendable {
 
-    private let visionClient: GeminiVisionClient
+    private let visionClient: any FoodVisionIdentifying
     private let nutritionClient: USDANutritionClient
 
-    init(visionClient: GeminiVisionClient, nutritionClient: USDANutritionClient) {
+    init(visionClient: any FoodVisionIdentifying, nutritionClient: USDANutritionClient) {
         self.visionClient = visionClient
         self.nutritionClient = nutritionClient
     }
@@ -38,9 +38,20 @@ extension FoodAnalysisServiceLive {
     static func makeDefault() -> FoodAnalysisServiceLive {
         let geminiAPIKey = loadSecret("GEMINI_API_KEY", placeholder: "YOUR_GEMINI_API_KEY")
         let usdaAPIKey = loadSecret("USDA_API_KEY", placeholder: "YOUR_USDA_API_KEY")
+        let groqAPIKey = loadSecret("GROQ_API_KEY", placeholder: "YOUR_GROQ_API_KEY")
+
+        let geminiClient = GeminiVisionClient(apiKey: geminiAPIKey)
+        let groqClient: GroqVisionClient? = groqAPIKey != "YOUR_GROQ_API_KEY"
+            ? GroqVisionClient(apiKey: groqAPIKey)
+            : nil
+
+        let visionClient = FallbackVisionClient(
+            primary: geminiClient,
+            fallback: groqClient
+        )
 
         return FoodAnalysisServiceLive(
-            visionClient: GeminiVisionClient(apiKey: geminiAPIKey),
+            visionClient: visionClient,
             nutritionClient: USDANutritionClient(apiKey: usdaAPIKey)
         )
     }
