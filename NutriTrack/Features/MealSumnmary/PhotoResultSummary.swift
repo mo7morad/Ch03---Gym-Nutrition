@@ -27,19 +27,23 @@ struct PhotoResultSummary: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+//        ZStack (alignment: .bottomLeading){
             ScrollView(.vertical, showsIndicators: true) {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 15) {
                     mealPhotoView
-
-                    mealTitleSection
-
+                    
+                    Text(meal.mealHeadline)
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(Color(hex: "181818"))
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
                     macroGrid
-
-                    if context == .loggedMeal, ingredientsSubtitle == nil {
+                    
+                    if context == .loggedMeal {
                         ingredientsSection
                     }
-
+                    
                     if context == .newMeal {
                         doneButton
                     }
@@ -47,15 +51,27 @@ struct PhotoResultSummary: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
-                .padding(.bottom, context == .loggedMeal ? MealLoggedConfirmationView.scrollBottomInset : 32)
+                .padding(.bottom, 120)
+            
+                    
             }
+            
+            .ignoresSafeArea(.all, edges: .bottom)
             .scrollBounceBehavior(.basedOnSize)
-
-            if context == .loggedMeal {
-                MealLoggedConfirmationView()
-                    .ignoresSafeArea(edges: .bottom)
+    
+            .overlay (alignment: .bottomLeading){
+            Image("MealLoggedHappy")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 400, height: 190)
+                .offset(x: -100, y: 100)
+                .ignoresSafeArea(.all, edges: .bottom)
             }
-        }
+            
+            
+//        }
+        
+        .scrollBounceBehavior(.basedOnSize)
         .background(Color(hex: "F3F3F3"))
         .preferredColorScheme(.light)
         .navigationTitle(meal.mealPeriodTitle)
@@ -68,6 +84,7 @@ struct PhotoResultSummary: View {
                         .fontWeight(.semibold)
                         .foregroundStyle(Color(hex: "181818"))
                 }
+                .accessibilityLabel(context == .loggedMeal ? "Back" : "Close")
             }
         }
     }
@@ -78,38 +95,6 @@ struct PhotoResultSummary: View {
         } else {
             onDismiss()
         }
-    }
-
-    // MARK: - Title
-
-    private var mealTitleSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(meal.mealHeadline)
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(Color(hex: "181818"))
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            if let ingredientsSubtitle {
-                Text(ingredientsSubtitle)
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color(hex: "181818"))
-                    .opacity(0.5)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-        }
-    }
-
-    /// Comma-separated foods shown under the AI meal name.
-    private var ingredientsSubtitle: String? {
-        let label = meal.ingredientsLabel
-        guard label != "No ingredients" else { return nil }
-
-        let hasAIMealName = !(meal.mealName?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
-        guard hasAIMealName else { return nil }
-
-        return label
     }
 
     // MARK: - Photo
@@ -136,6 +121,7 @@ struct PhotoResultSummary: View {
         .frame(height: photoHeight)
         .clipped()
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .accessibilityLabel(meal.photoRef == nil ? "Meal photo placeholder" : "Meal photo")
     }
 
     // MARK: - Macros
@@ -144,15 +130,13 @@ struct PhotoResultSummary: View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
                 MacroResultCard(
-                    title: "Calories",
-                    iconName: "flame.fill",
+                    title: "Calories", iconName: "heart",
                     amount: totals.calories,
                     unit: "kcal",
                     themeColor: Color(hex: "10937E")
                 )
                 MacroResultCard(
-                    title: "Protein",
-                    iconName: "p.circle.fill",
+                    title: "Protein", iconName: "heart",
                     amount: totals.protein,
                     unit: "g",
                     themeColor: Color(hex: "D16D8E")
@@ -161,15 +145,13 @@ struct PhotoResultSummary: View {
 
             HStack(spacing: 12) {
                 MacroResultCard(
-                    title: "Carbs",
-                    iconName: "leaf.fill",
+                    title: "Carbs", iconName: "heart",
                     amount: totals.carbs,
                     unit: "g",
                     themeColor: .orange
                 )
                 MacroResultCard(
-                    title: "Fat",
-                    iconName: "drop.fill",
+                    title: "Fat", iconName: "heart",
                     amount: totals.fat,
                     unit: "g",
                     themeColor: .indigo
@@ -178,8 +160,7 @@ struct PhotoResultSummary: View {
 
             HStack(spacing: 12) {
                 MacroResultCard(
-                    title: "Fiber",
-                    iconName: "leaf.circle.fill",
+                    title: "Fiber", iconName: "",
                     amount: totals.fiber,
                     unit: "g",
                     themeColor: Color(hex: "8A9B3B")
@@ -195,8 +176,9 @@ struct PhotoResultSummary: View {
     private var ingredientsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Ingredients")
-                .font(.system(size: 16, weight: .semibold))
+                .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(Color(hex: "181818"))
+                .accessibilityAddTraits(.isHeader)
 
             Text(meal.ingredientsLabel)
                 .font(.system(size: 14))
@@ -218,6 +200,8 @@ struct PhotoResultSummary: View {
                 .frame(height: 52)
                 .background(.black, in: RoundedRectangle(cornerRadius: 50))
         }
+        .accessibilityLabel("Done")
+        .accessibilityHint("Logs this meal")
     }
 }
 
@@ -227,7 +211,6 @@ struct PhotoResultSummary: View {
             id: UUID(),
             timestamp: Date(),
             photoRef: nil,
-            mealName: "Chicken and Rice Bowl",
             items: [
                 FoodItem(
                     id: UUID(),
