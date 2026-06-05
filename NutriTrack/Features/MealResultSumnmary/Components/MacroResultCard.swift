@@ -31,7 +31,7 @@ struct MacroResultCard: View {
 
             Text(formattedAmount)
                 .font(.title2.weight(.semibold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(Color(hex: "181818"))
                 .minimumScaleFactor(0.8)
                 .lineLimit(1)
         }
@@ -86,4 +86,5 @@ struct MacroResultCard: View {
         )
     }
     .padding(16)
+    .background(Color(hex: "F3F3F3"))
 }
