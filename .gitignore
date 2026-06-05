@@ -6,3 +6,7 @@ build/
 
 # Secrets — never commit real API keys
 NutriTrack/Resources/Secrets.plist
+
+**.Secrets
+**Secrets
+/Users/davidpaulong/Documents/Programming/Swift/nutrition-app/Ch03---Gym-Nutrition/NutriTrack/Resources/Secrets.plist

@@ -74,7 +74,7 @@ struct CaloriesMacrosView: View {
     private var caloriesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .center) {
-                Text("\(caloriesRemaining) Calories Left")
+                Text("\(String(caloriesRemaining)) Calories Left")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(Color(hex: "10937E"))
                     .lineLimit(1)
