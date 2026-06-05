@@ -27,40 +27,32 @@ struct PhotoResultSummary: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            ScrollView(.vertical, showsIndicators: true) {
-                VStack(alignment: .leading, spacing: 20) {
-                    mealPhotoView
+        ScrollView(.vertical, showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 20) {
+                mealPhotoView
 
-                    Text(meal.mealHeadline)
-                        .font(.system(size: 22, weight: .semibold))
-                        .foregroundStyle(Color(hex: "181818"))
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                Text(meal.mealHeadline)
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(Color(hex: "181818"))
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                    macroGrid
+                macroGrid
 
-                    if context == .loggedMeal {
-                        ingredientsSection
-                    }
-
-                    if context == .newMeal {
-                        doneButton
-                    }
+                if context == .loggedMeal {
+                    ingredientsSection
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, context == .loggedMeal ? MealLoggedConfirmationView.scrollBottomInset : 32)
-            }
-            .scrollBounceBehavior(.basedOnSize)
 
-            if context == .loggedMeal {
-                MealLoggedConfirmationView()
-                    .ignoresSafeArea(edges: [.bottom, .leading])
+                if context == .newMeal {
+                    doneButton
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 32)
         }
-        .clipped()
+        .scrollBounceBehavior(.basedOnSize)
         .background(Color(hex: "F3F3F3"))
         .preferredColorScheme(.light)
         .navigationTitle(meal.mealPeriodTitle)
@@ -120,14 +112,12 @@ struct PhotoResultSummary: View {
             HStack(spacing: 12) {
                 MacroResultCard(
                     title: "Calories",
-                    iconName: "flame.fill",
                     amount: totals.calories,
                     unit: "kcal",
                     themeColor: Color(hex: "10937E")
                 )
                 MacroResultCard(
                     title: "Protein",
-                    iconName: "p.circle.fill",
                     amount: totals.protein,
                     unit: "g",
                     themeColor: Color(hex: "D16D8E")
@@ -137,14 +127,12 @@ struct PhotoResultSummary: View {
             HStack(spacing: 12) {
                 MacroResultCard(
                     title: "Carbs",
-                    iconName: "leaf.fill",
                     amount: totals.carbs,
                     unit: "g",
                     themeColor: .orange
                 )
                 MacroResultCard(
                     title: "Fat",
-                    iconName: "drop.fill",
                     amount: totals.fat,
                     unit: "g",
                     themeColor: .indigo
@@ -154,7 +142,6 @@ struct PhotoResultSummary: View {
             HStack(spacing: 12) {
                 MacroResultCard(
                     title: "Fiber",
-                    iconName: "leaf.circle.fill",
                     amount: totals.fiber,
                     unit: "g",
                     themeColor: Color(hex: "8A9B3B")

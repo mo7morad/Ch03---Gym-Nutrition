@@ -71,11 +71,5 @@ struct MacroElement: View {
             }
         }
         .frame(height: 8)
-        .accessibilityProgress(
-            label: "\(macrotype) progress",
-            current: progress,
-            target: target,
-            unit: "grams"
-        )
     }
 }

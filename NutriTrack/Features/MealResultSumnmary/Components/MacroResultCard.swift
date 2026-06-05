@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MacroResultCard: View {
     let title: String
-    let iconName: String
     let amount: Double
     let unit: String
     let themeColor: Color
@@ -20,19 +19,13 @@ struct MacroResultCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 4) {
-                Image(systemName: iconName)
-                    .foregroundStyle(themeColor)
-                    .accessibilityDecorative()
-
-                Text(title)
-                    .foregroundStyle(.secondary)
-            }
-            .font(.subheadline.weight(.medium))
+            Text(title)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(themeColor)
 
             Text(formattedAmount)
                 .font(.title2.weight(.semibold))
-                .foregroundStyle(Color(hex: "181818"))
+                .foregroundStyle(themeColor)
                 .minimumScaleFactor(0.8)
                 .lineLimit(1)
         }
@@ -40,7 +33,7 @@ struct MacroResultCard: View {
         .frame(maxWidth: .infinity, minHeight: 88, alignment: .leading)
         .background {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white)
+                .fill(Color(hex: "E8E8E8"))
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title), \(formattedAmount)")
@@ -56,15 +49,13 @@ struct MacroResultCard: View {
     LazyVGrid(columns: columns, spacing: 16) {
         MacroResultCard(
             title: "Calories",
-            iconName: "flame.fill",
             amount: 680,
-            unit: "",
+            unit: "kcal",
             themeColor: .teal
         )
 
         MacroResultCard(
             title: "Protein",
-            iconName: "p.circle.fill",
             amount: 24,
             unit: "g",
             themeColor: .pink
@@ -72,7 +63,6 @@ struct MacroResultCard: View {
 
         MacroResultCard(
             title: "Carbs",
-            iconName: "leaf.fill",
             amount: 78,
             unit: "g",
             themeColor: .orange
@@ -80,7 +70,6 @@ struct MacroResultCard: View {
 
         MacroResultCard(
             title: "Fat",
-            iconName: "drop.fill",
             amount: 30,
             unit: "g",
             themeColor: .indigo
