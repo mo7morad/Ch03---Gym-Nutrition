@@ -61,6 +61,7 @@ struct PhotoResultSummary: View {
             }
         }
         .background(Color(hex: "F3F3F3"))
+        .preferredColorScheme(.light)
         .navigationTitle(meal.mealPeriodTitle)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(context == .loggedMeal)
