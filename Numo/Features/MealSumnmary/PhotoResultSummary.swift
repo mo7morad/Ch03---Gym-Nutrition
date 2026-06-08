@@ -40,7 +40,7 @@ struct PhotoResultSummary: View {
                     
                     macroGrid
                     
-                    if context == .loggedMeal {
+                    if !meal.items.isEmpty {
                         ingredientsSection
                     }
                     
