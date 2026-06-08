@@ -3,11 +3,17 @@
 import SwiftUI
 
 struct FoodItemRow: View {
-    let item: FoodItem
+    let item: FoodItemModel
+
+    private var displayName: String {
+        let label = item.nutrition.foodName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !label.isEmpty { return label }
+        return item.name.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(USDAQuerySanitizer.displayName(from: item.name))
+            Text(displayName)
                 .font(.headline)
 
             HStack(spacing: 12) {
@@ -23,7 +29,7 @@ struct FoodItemRow: View {
 }
 
 #Preview {
-    FoodItemRow(item: FoodItem(
+    FoodItemRow(item: FoodItemModel(
         id: UUID(),
         name: "Grilled Chicken",
         nutrition: NutritionInfo(

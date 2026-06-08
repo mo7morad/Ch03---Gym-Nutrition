@@ -15,10 +15,8 @@ extension MealEntry {
     var itemDisplayNames: [String] {
         items.map { item in
             let label = item.nutrition.foodName.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !label.isEmpty {
-                return USDAQuerySanitizer.readableName(from: label)
-            }
-            return USDAQuerySanitizer.readableName(from: item.name)
+            if !label.isEmpty { return label }
+            return item.name.trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
 

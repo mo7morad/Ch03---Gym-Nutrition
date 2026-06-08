@@ -1,15 +1,17 @@
-// FILE: NutriTrack/Core/Services/FoodAnalysis/VisionImageEncoder.swift
-
 import UIKit
 
-enum VisionImageEncoder {
-    /// Groq limits base64-encoded image requests to 4 MB; reserve headroom for the JSON body.
-    private static let maxBase64Length = 3_000_000
+enum ImagePayloadEncoder {
+    /// Anthropic API allows up to 10 MB base64-encoded per image; reserve headroom for the JSON body.
+    /// See: https://platform.claude.com/docs/en/docs/build-with-claude/vision
+    private static let maxBase64Length = 9_000_000
 
-    /// Encodes a JPEG suitable for Groq vision (resize + compress until under payload limit).
-    static func jpegDataForGroq(from image: UIImage) throws -> Data {
-        let maxEdgeLengths: [CGFloat] = [1536, 1280, 1024, 768, 512]
-        let qualities: [CGFloat] = [0.75, 0.6, 0.45, 0.3]
+    /// Claude Sonnet resizes images beyond 1568 px on the long edge; pre-resize to save tokens/latency.
+    private static let nativeLongEdge: CGFloat = 1568
+
+    /// Encodes a JPEG suitable for Anthropic vision (resize + compress until under payload limit).
+    static func jpegDataForVision(from image: UIImage) throws -> Data {
+        let maxEdgeLengths: [CGFloat] = [nativeLongEdge, 1280, 1024, 768, 512]
+        let qualities: [CGFloat] = [0.82, 0.7, 0.55, 0.4]
 
         for maxEdge in maxEdgeLengths {
             let resized = resize(image, maxLongestEdge: maxEdge)
@@ -21,7 +23,7 @@ enum VisionImageEncoder {
             }
         }
 
-        throw VisionImageEncodingError.payloadTooLarge
+        throw ImagePayloadEncodingError.payloadTooLarge
     }
 
     private static func resize(_ image: UIImage, maxLongestEdge: CGFloat) -> UIImage {
@@ -40,13 +42,13 @@ enum VisionImageEncoder {
     }
 }
 
-enum VisionImageEncodingError: LocalizedError {
+enum ImagePayloadEncodingError: LocalizedError {
     case payloadTooLarge
 
     var errorDescription: String? {
         switch self {
         case .payloadTooLarge:
-            return "Image is too large to send to the vision API."
+            return "Image is too large to send to the analysis API."
         }
     }
 }
