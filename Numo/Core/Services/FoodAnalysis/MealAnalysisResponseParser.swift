@@ -10,6 +10,11 @@ enum MealAnalysisResponseParser {
         }
 
         let mealName = MealNameSanitizer.sanitize(response.mealName) ?? ""
+        if response.items.count > 8 {
+            // The model ignored the "at most 8 items" rule. Capping here but this
+            // should be rare — if it happens frequently, tighten the prompt.
+            print("[NutriTrack] ⚠️ MealAnalysis returned \(response.items.count) items — capping at 8. Check prompt.")
+        }
         let cappedItems = Array(response.items.prefix(8))
         let items = cappedItems.map { item in
             NutritionInfo(

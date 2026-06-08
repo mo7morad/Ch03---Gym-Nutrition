@@ -160,7 +160,11 @@ struct AnthropicMealAnalysisClient: Sendable {
     private func buildRequest(base64Image: String) -> AnthropicRequest {
         AnthropicRequest(
             model: Self.model,
+            // 2048 is enough for 8 food items at ~200 tokens each, plus schema overhead.
+            // If stop_reason == "max_tokens" fires in prod, increase to 4096.
             maxTokens: 2048,
+            // Temperature 0 = deterministic output. Do NOT increase — structured nutrition
+            // data must be reproducible and schema-compliant, not creative.
             temperature: 0,
             system: MealAnalysisPrompt.systemInstructions,
             messages: [

@@ -1,11 +1,15 @@
+// MealAnalysisOutputSchema.swift
+//
+// Defines the JSON Schema for Anthropic structured outputs (output_config.format).
+//
+// ⚠️ Schema keyword restrictions — Anthropic's constrained decoding does NOT support:
+//   maxItems, minItems > 1, minLength, maxLength, minimum, maximum, pattern
+// Violating this causes a 400 error from the API.
+// Enforcement of these constraints is done in MealAnalysisResponseParser instead.
+// Reference: https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations
+
 import Foundation
 
-/// JSON schema for Anthropic structured outputs (`output_config.format`).
-///
-/// Must comply with Anthropic JSON Schema limitations — unsupported keywords cause 400 errors.
-/// Not allowed: `maxItems`, `minLength`, `maxLength`, `minimum`, `maximum`, etc.
-/// Allowed array constraint: `minItems` only (values 0 or 1).
-/// See: https://platform.claude.com/docs/en/docs/build-with-claude/structured-outputs#json-schema-limitations
 enum MealAnalysisOutputSchema {
     static let format = JSONOutputFormat(schema: Root())
 
