@@ -7,7 +7,7 @@ struct MealEntry: Identifiable {
     var timestamp: Date
     var photoRef: String?
     var mealName: String?
-    var items: [FoodItem]
+    var items: [FoodItemModel]
 
     var totalNutrition: NutritionInfo {
         items.reduce(

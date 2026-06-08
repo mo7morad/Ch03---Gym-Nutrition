@@ -30,7 +30,7 @@ final class FoodAnalysisServiceMock: FoodAnalysisService, @unchecked Sendable {
         return Self.sampleMeals.randomElement() ?? Self.chickenAndRiceMeal
     }
 
-    // MARK: - Sample Data (realistic USDA values scaled to gram weight)
+    // MARK: - Sample Data
 
     private static let chickenAndRiceMeal = MealAnalysisResult(
         mealName: "Grilled Chicken and Brown Rice",

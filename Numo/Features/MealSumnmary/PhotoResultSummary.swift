@@ -212,7 +212,7 @@ struct PhotoResultSummary: View {
             timestamp: Date(),
             photoRef: nil,
             items: [
-                FoodItem(
+                FoodItemModel(
                     id: UUID(),
                     name: "rice, white, cooked",
                     nutrition: NutritionInfo(
@@ -225,7 +225,7 @@ struct PhotoResultSummary: View {
                         servingSize: "1 cup"
                     )
                 ),
-                FoodItem(
+                FoodItemModel(
                     id: UUID(),
                     name: "chicken, leg, cooked",
                     nutrition: NutritionInfo(

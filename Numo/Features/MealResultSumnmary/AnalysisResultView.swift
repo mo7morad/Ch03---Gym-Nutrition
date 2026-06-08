@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct AnalysisResultView: View {
-    let items: [FoodItem]
+    let items: [FoodItemModel]
     let onLog: () -> Void
     let onRetake: () -> Void
 
@@ -43,7 +43,7 @@ struct AnalysisResultView: View {
 #Preview {
     AnalysisResultView(
         items: [
-            FoodItem(
+            FoodItemModel(
                 id: UUID(),
                 name: "Grilled Chicken",
                 nutrition: NutritionInfo(
@@ -56,7 +56,7 @@ struct AnalysisResultView: View {
                     servingSize: "200g"
                 )
             ),
-            FoodItem(
+            FoodItemModel(
                 id: UUID(),
                 name: "Brown Rice",
                 nutrition: NutritionInfo(

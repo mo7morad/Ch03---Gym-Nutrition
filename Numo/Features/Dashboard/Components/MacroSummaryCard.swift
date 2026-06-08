@@ -76,7 +76,7 @@ struct MacroSummaryCard: View {
 }
 
 #Preview {
-    let mockItem1 = FoodItem(
+    let mockItem1 = FoodItemModel(
         id: UUID(),
         name: "rice, white, cooked",
         nutrition: NutritionInfo(
@@ -89,7 +89,7 @@ struct MacroSummaryCard: View {
             servingSize: "300g"
         )
     )
-    let mockItem2 = FoodItem(
+    let mockItem2 = FoodItemModel(
         id: UUID(),
         name: "chicken, breast, cooked",
         nutrition: NutritionInfo(

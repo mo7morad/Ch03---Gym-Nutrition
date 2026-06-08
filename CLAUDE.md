@@ -32,10 +32,20 @@ NutriTrack/
 │   │
 │   ├── Services/
 │   │   ├── NutritionCalculator.swift
-│   │   ├── FoodAnalysisService.swift         ← protocol only
-│   │   ├── FoodAnalysisServiceMock.swift     ← active implementation (dummy data)
-│   │   ├── FoodAnalysisServiceLive.swift     ← STUB only, not implemented yet
-│   │   └── ImageProcessingService.swift
+│   │   ├── ImageProcessingService.swift
+│   │   └── FoodAnalysis/
+│   │       ├── FoodAnalysisService.swift         ← protocol
+│   │       ├── FoodAnalysisServiceLive.swift     ← production (Anthropic)
+│   │       ├── FoodAnalysisServiceMock.swift     ← previews/tests
+│   │       ├── AnthropicMealAnalysisClient.swift
+│   │       ├── MealAnalysisPrompt.swift
+│   │       ├── MealAnalysisOutputSchema.swift
+│   │       ├── MealAnalysisResponse.swift
+│   │       ├── MealAnalysisResponseParser.swift
+│   │       ├── MealAnalysisResult.swift
+│   │       ├── ImagePayloadEncoder.swift
+│   │       ├── MealNameSanitizer.swift
+│   │       └── SecretLoader.swift
 │   │
 │   └── Utilities/
 │       ├── Extensions/
@@ -165,26 +175,35 @@ struct MealEntry: Identifiable {
 
 ### FoodAnalysisService
 
-Photo analysis is **not implemented**. The mock is the only active implementation.
-Do NOT attempt to implement FoodAnalysisServiceLive. Leave it as a stub.
+Photo analysis uses the **Anthropic Messages API** (`claude-sonnet-4-6` with vision).
+A single API call identifies foods in the photo and estimates per-item macros.
+`FoodAnalysisServiceLive` is the production implementation; `FoodAnalysisServiceMock` is for previews and tests.
+
+**API key setup:**
+1. Copy `Resources/Secrets.template.plist` → `Resources/Secrets.plist`
+2. Set `ANTHROPIC_API_KEY` to your real key
+3. `Secrets.plist` is gitignored — never commit real keys
+
+**Anthropic best practices enforced in code:**
+- Structured outputs via `output_config.format` (JSON schema) — not prompt-only JSON
+- `system` parameter for instructions; user message is image-then-text
+- `temperature: 0` for analytical output; `effort: "medium"` on Sonnet 4.6
+- Images pre-resized to 1568 px long edge before upload (vision token/latency guidance)
+- `anthropic-version: 2023-06-01` header on every request
 
 ```swift
 // FoodAnalysisService.swift
 protocol FoodAnalysisService {
-    func analyze(image: UIImage) async throws -> [FoodItem]
+    func analyze(image: UIImage) async throws -> MealAnalysisResult
 }
 
-// FoodAnalysisServiceMock.swift
-struct FoodAnalysisServiceMock: FoodAnalysisService {
-    func analyze(image: UIImage) async throws -> [FoodItem] {
-        try await Task.sleep(for: .seconds(1.5)) // simulate network latency
-        return [
-            FoodItem(id: UUID(), name: "Grilled Chicken", nutrition: NutritionInfo(calories: 320, proteinGrams: 42, carbsGrams: 0, fatGrams: 14)),
-            FoodItem(id: UUID(), name: "Brown Rice", nutrition: NutritionInfo(calories: 215, proteinGrams: 5, carbsGrams: 45, fatGrams: 2))
-        ]
-    }
-}
+// FoodAnalysisServiceLive.swift — production wiring
+// AppDependencies.live → FoodAnalysisServiceLive.makeDefault()
+//   → AnthropicMealAnalysisClient(apiKey:)
+//   → POST https://api.anthropic.com/v1/messages
 ```
+
+**Pipeline:** photo → `ImagePayloadEncoder` → Anthropic Messages API (structured JSON) → `MealAnalysisResponseParser` → `MealAnalysisResult`
 
 ### NutritionCalculator
 
@@ -296,7 +315,7 @@ Labels show `consumed / goal` in grams (e.g. "42g / 150g").
 
 1. **One file per type.** No two structs/classes/enums in the same file.
 2. **No logic in views.** Views are dumb. ViewModels hold state and business logic.
-3. **Never implement `FoodAnalysisServiceLive`.** It's a future task.
+3. **Food analysis is Anthropic-only.** Do not add USDA, Gemini, or Groq providers.
 4. **Never hardcode design tokens.** Use semantic names from DesignSystem (even as TODOs).
 5. **All async work uses `async/await`.** No `DispatchQueue.main.async`.
 6. **Do not create files outside the defined folder structure** without noting it explicitly.
