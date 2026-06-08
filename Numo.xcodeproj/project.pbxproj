@@ -79,7 +79,7 @@
 			name = Numo;
 			packageProductDependencies = (
 			);
-			productName = NutriTrack;
+			productName = Numo;
 			productReference = 14DF200A2FC5229500516055 /* Numo.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -269,7 +269,7 @@
 				DEVELOPMENT_TEAM = BD8SA4X398;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = NutriTrack/Resources/Info.plist;
+				INFOPLIST_FILE = Numo/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Numo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -300,7 +300,7 @@
 				DEVELOPMENT_TEAM = BD8SA4X398;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = NutriTrack/Resources/Info.plist;
+				INFOPLIST_FILE = Numo/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Numo;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
