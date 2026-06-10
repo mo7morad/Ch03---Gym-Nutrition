@@ -48,7 +48,7 @@ struct MealLogView: View {
 
         case .result(let mealName, let items):
             NavigationStack {
-                PhotoResultSummary(
+                DescribeMealView(
                     meal: viewModel.makeMealEntry(mealName: mealName, items: items),
                     context: .newMeal,
                     onDone: {
@@ -59,7 +59,9 @@ struct MealLogView: View {
                     onDismiss: {
                         viewModel.retake()
                         onCancel()
-                    }
+                    },
+                    viewModel: viewModel
+                    
                 )
             }
 

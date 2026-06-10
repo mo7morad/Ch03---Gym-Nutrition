@@ -8,19 +8,31 @@
 import SwiftUI
 
 struct DescribeMealView: View {
-    // Sample state data matching your screenshot
-    @State private var ingredients = [
-        FoodItemModel(
-            id: UUID(),
-            name: "Rice",
-            nutrition: NutritionInfo(foodName: "Rice", calories: 20, protein: 20, carbs: 20, fat: 20, fiber: 20, servingSize: "120")
-        ),
-        FoodItemModel(
-            id: UUID(),
-            name: "Chicken Nugget",
-            nutrition: NutritionInfo(foodName: "Chicken Nugget", calories: 20, protein: 20, carbs: 20, fat: 20, fiber: 20, servingSize: "30")
-        )
-    ]
+    
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var navigateToSummary = false
+    
+    
+    enum Context {
+        case newMeal
+        case loggedMeal
+    }
+    
+    @State var meal: MealEntry
+    var context: Context = .newMeal
+    var onDone: () -> Void = {}
+    var onDismiss: () -> Void = {}
+    @State var viewModel: MealLogViewModel
+    
+    init(meal: MealEntry, context: Context, onDone: @escaping () -> Void, onDismiss: @escaping () -> Void, viewModel: MealLogViewModel) {
+        self.meal = meal
+        self.context = context
+        self.onDone = onDone
+        self.onDismiss = onDismiss
+        self.viewModel = viewModel
+    }
+    
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -38,7 +50,10 @@ struct DescribeMealView: View {
                             .font(.title2)
                             .fontWeight(.bold)
                         
-                        Text("Breakfast")
+                        TextField("Meal Type", text: Binding(
+                            get: { meal.mealPeriodTitle },
+                            set: { meal.mealPeriodTitle = $0 }
+                        ))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
                             .background(Color(UIColor.secondarySystemBackground))
@@ -50,7 +65,10 @@ struct DescribeMealView: View {
                             .font(.title2)
                             .fontWeight(.bold)
                         
-                        Text("Nugget Chili Pepper Salt")
+                        TextField("Meal Name", text: Binding(
+                            get: { meal.mealName ?? "" },
+                            set: { meal.mealName = $0 }
+                        ))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
                             .background(Color(UIColor.secondarySystemBackground))
@@ -62,24 +80,68 @@ struct DescribeMealView: View {
                             .font(.title2)
                             .fontWeight(.bold)
                         
-                        ForEach(ingredients) { ingredient in
+                        ForEach(meal.items) { ingredient in
                             IngredientRowView(ingredient: ingredient) {
                                 // Delete action logic here
-                                if let index = ingredients.firstIndex(where: { $0.id == ingredient.id }) {
-                                    ingredients.remove(at: index)
+                                if let index = meal.items.firstIndex(where: { $0.id == ingredient.id }) {
+                                    meal.items.remove(at: index)
                                 }
                             }
                         }
                     }
                     
                     
-                    Spacer(minLength: 120)
+                    Spacer()
                 }
                 .padding(.horizontal, 20)
+                
+                
+                // Add Ingredients Floating Button
+                Button(action: { meal.items.append(
+                    FoodItemModel(
+                        id: UUID(),
+                        name: "",
+                        nutrition: NutritionInfo(
+                            foodName: "",
+                            calories: 0,
+                            protein: 0,
+                            carbs: 0,
+                            fat: 0,
+                            fiber: 0,
+                            servingSize: "0 cup"
+                        )
+                    )
+                )}) {
+                    HStack {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(Color(red: 0.05, green: 0.15, blue: 0.25))
+                        Text("Add Ingredients")
+                            .foregroundColor(.black)
+                            .fontWeight(.medium)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                    .background(Color.white.opacity(0.95))
+                    .clipShape(Capsule())
+                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                }
+                .padding(.bottom, 30)
+                
+                bottomOverlay
             }
             
-            // Bottom Graphic & Add Button overlay
-            bottomOverlay
+//            // Bottom Graphic & Add Button overlay
+//            bottomOverlay
+        }
+        
+
+    }
+    
+    private func close() {
+        if context == .loggedMeal {
+            dismiss()
+        } else {
+            onDismiss()
         }
     }
     
@@ -87,7 +149,7 @@ struct DescribeMealView: View {
     
     private var customNavigationBar: some View {
         HStack {
-            Button(action: { /* Back Action */ }) {
+            Button(action: {close()}) {
                 Image(systemName: "chevron.left")
                     .foregroundColor(.black)
                     .frame(width: 44, height: 44)
@@ -104,7 +166,7 @@ struct DescribeMealView: View {
             
             Spacer()
             
-            Button(action: { /* Save Action */ }) {
+            Button(action: {navigateToSummary = true}) {
                 Image(systemName: "checkmark")
                     .foregroundColor(.white)
                     .frame(width: 44, height: 44)
@@ -113,7 +175,23 @@ struct DescribeMealView: View {
             }
         }
         .padding(.top, 10)
+        .navigationDestination(isPresented: $navigateToSummary){
+            PhotoResultSummary(
+                meal: meal,
+                context: .newMeal,
+                onDone: {
+                    onDone()
+                },
+                onDismiss: {
+                    onDismiss()
+                }
+            )
+        }
+        .accessibilityLabel(context == .loggedMeal ? "Back" : "Close")
+
+    
     }
+
     
     private var photoPickerSection: some View {
         HStack {
@@ -152,23 +230,6 @@ struct DescribeMealView: View {
             Image("MascotManualLogging")
             .offset(x: -100, y: 80)
             .frame(width: 180, height: 180)
-            
-            // Add Ingredients Floating Button
-            Button(action: { /* Add Ingredient Action */ }) {
-                HStack {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundColor(Color(red: 0.05, green: 0.15, blue: 0.25))
-                    Text("Add Ingredients")
-                        .foregroundColor(.black)
-                        .fontWeight(.medium)
-                }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 16)
-                .background(Color.white.opacity(0.95))
-                .clipShape(Capsule())
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
-            }
-            .padding(.bottom, 30)
         }
         .frame(maxWidth: .infinity)
     }
@@ -176,7 +237,38 @@ struct DescribeMealView: View {
 
 
 struct DescribeMealView_Previews: PreviewProvider {
+    
     static var previews: some View {
-        DescribeMealView()
+        @Environment(\.foodAnalysisService) var foodAnalysisService
+        DescribeMealView(
+            meal: MealEntry(id: UUID(), timestamp: Date(), photoRef: nil, mealName: "Super Chicken", items: [
+                FoodItemModel(
+                    id: UUID(),
+                    name: "rice, white, cooked",
+                    nutrition: NutritionInfo(
+                        foodName: "Rice",
+                        calories: 215,
+                        protein: 5,
+                        carbs: 45,
+                        fat: 2,
+                        fiber: 4,
+                        servingSize: "1 cup"
+                    )
+                ),
+                FoodItemModel(
+                    id: UUID(),
+                    name: "chicken, leg, cooked",
+                    nutrition: NutritionInfo(
+                        foodName: "Chicken leg",
+                        calories: 320,
+                        protein: 18,
+                        carbs: 20,
+                        fat: 20,
+                        fiber: 1,
+                        servingSize: "1 leg"
+                    )
+                )
+            ]), context: .loggedMeal, onDone: {print("done")}, onDismiss:{print("dismiss")}, viewModel: MealLogViewModel(analysisService: foodAnalysisService)
+        )
     }
 }

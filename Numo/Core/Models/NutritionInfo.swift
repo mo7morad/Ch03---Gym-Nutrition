@@ -8,13 +8,13 @@ import Foundation
 /// Represents macros scaled to the estimated gram weight of the food.
 /// This is a value type — no SwiftData, no @Model.
 struct NutritionInfo: Equatable, Hashable, Codable, Sendable {
-    let foodName: String
-    let calories: Double
-    let protein: Double
-    let carbs: Double
-    let fat: Double
-    let fiber: Double
-    let servingSize: String
+    var foodName: String
+    var calories: Double
+    var protein: Double
+    var carbs: Double
+    var fat: Double
+    var fiber: Double
+    var servingSize: String
 }
 
 // MARK: - Computed Helpers

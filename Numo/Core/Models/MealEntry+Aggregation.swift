@@ -1,16 +1,35 @@
 import Foundation
 
 extension MealEntry {
-    /// Meal slot label from log time (Breakfast, Lunch, Snack, Dinner).
+    
     var mealPeriodTitle: String {
-        let hour = Calendar.current.component(.hour, from: timestamp)
-        switch hour {
-        case 5..<11: return "Breakfast"
-        case 11..<15: return "Lunch"
-        case 15..<18: return "Snack"
-        default: return "Dinner"
+        get {
+            if let custom = _mealPeriodTitle {
+                return custom
+            }
+            let hour = Calendar.current.component(.hour, from: timestamp)
+            switch hour {
+            case 5..<11: return "Breakfast"
+            case 11..<15: return "Lunch"
+            case 15..<18: return "Snack"
+            default: return "Dinner"
+            }
+        }
+        set {
+            _mealPeriodTitle = newValue
         }
     }
+
+//    /// Meal slot label from log time (Breakfast, Lunch, Snack, Dinner).
+//    var mealPeriodTitle: String {
+//        let hour = Calendar.current.component(.hour, from: timestamp)
+//        switch hour {
+//        case 5..<11: return "Breakfast"
+//        case 11..<15: return "Lunch"
+//        case 15..<18: return "Snack"
+//        default: return "Dinner"
+//        }
+//    }
 
     var itemDisplayNames: [String] {
         items.map { item in

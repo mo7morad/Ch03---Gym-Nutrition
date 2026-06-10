@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct IngredientRowView: View {
-    var ingredient: FoodItemModel
+    @State var ingredient: FoodItemModel
     var onDelete: () -> Void
     
     var body: some View {
         HStack(spacing: 12) {
             // Ingredient Name Pill
-            Text(ingredient.name)
+            TextField("Ingredient", text: $ingredient.name)
                 .font(.system(size: 15))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
@@ -23,9 +23,13 @@ struct IngredientRowView: View {
                 .clipShape(Capsule())
             
             // Amount Pill
-            Text("\(ingredient.nutrition.servingSize)")
+            TextField("Amount", text: Binding(
+                get: { String(ingredient.nutrition.servingSize) },
+                set: { ingredient.nutrition.servingSize = String($0)}
+            ))
                 .font(.system(size: 15))
                 .frame(width: 65)
+                .padding(.horizontal, 14)
                 .padding(.vertical, 14)
                 .background(Color(UIColor.secondarySystemBackground))
                 .clipShape(Capsule())

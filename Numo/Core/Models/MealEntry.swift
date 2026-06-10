@@ -8,7 +8,8 @@ struct MealEntry: Identifiable {
     var photoRef: String?
     var mealName: String?
     var items: [FoodItemModel]
-
+    var _mealPeriodTitle: String?
+    
     var totalNutrition: NutritionInfo {
         items.reduce(
             NutritionInfo(foodName: "", calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, servingSize: "")
