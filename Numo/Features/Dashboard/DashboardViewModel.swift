@@ -1,26 +1,28 @@
 import Foundation
+import SwiftData
 
 @Observable
 @MainActor
 final class DashboardViewModel {
-    var meals: [MealEntry] = []
-    var isPresentingMealLog = false
+    private(set) var currentDate = Date()
 
-    var dailyMeals: [MealEntry] {
-        meals
-            .filter { Calendar.current.isDateInToday($0.timestamp) }
+    func refreshCurrentDate() {
+        currentDate = .now
+    }
+
+    func dailyMeals(from persistedMeals: [LoggedMeal]) -> [MealEntry] {
+        persistedMeals
+            .map(\.mealEntry)
+            .meals(on: currentDate)
             .sorted { $0.timestamp > $1.timestamp }
     }
 
-    func presentMealLog() {
-        isPresentingMealLog = true
-    }
-
-    func dismissMealLog() {
-        isPresentingMealLog = false
-    }
-
-    func addMeal(_ meal: MealEntry) {
-        meals.insert(meal, at: 0)
+    func saveMeal(_ meal: MealEntry, context: ModelContext) {
+        context.insert(LoggedMeal.make(from: meal))
+        do {
+            try context.save()
+        } catch {
+            print("Failed to save meal: \(error)")
+        }
     }
 }

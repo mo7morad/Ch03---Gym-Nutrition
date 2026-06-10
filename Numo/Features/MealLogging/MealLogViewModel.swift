@@ -59,7 +59,6 @@ final class MealLogViewModel {
     }
 
     func logMeal(_ meal: MealEntry) {
-        // SwiftData persistence can be added here; dashboard receives the meal via onComplete.
         _ = meal
     }
 }

@@ -1,24 +1,26 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct DashboardView: View {
+    @Query(sort: \LoggedMeal.timestamp, order: .reverse) private var persistedMeals: [LoggedMeal]
     @Query private var profiles: [UserProfile]
-    
-    @State private var toggleStreak: Bool = false
-    @State private var toggleSettings: Bool = false
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.scenePhase) private var scenePhase
 
+    @State private var viewModel = DashboardViewModel()
+    @State private var toggleStreak = false
+    @State private var toggleSettings = false
     @State private var mealLogPresentation: MealLogPresentation?
-    @State private var dailyMeals: [MealEntry] = []
-    
-    @State private var streakCount: Int = 3
-    
+    @State private var streakCount = 3
+
     private enum MealLogPresentation: Identifiable {
         case camera
         case gallery
-        
+
         var id: Self { self }
     }
-    
+
     private var nutritionGoal: NutritionGoal {
         guard let profile = profiles.first else {
             return NutritionGoal(
@@ -31,15 +33,15 @@ struct DashboardView: View {
         }
         return NutritionCalculator.calculate(for: profile)
     }
-    
+
     private var todaysMeals: [MealEntry] {
-        dailyMeals.meals(on: .now)
+        viewModel.dailyMeals(from: persistedMeals)
     }
-    
+
     private var consumedToday: NutritionInfo {
         todaysMeals.totalNutrition
     }
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -48,7 +50,8 @@ struct DashboardView: View {
                         .resizable()
                         .frame(width: 220, height: 150)
                         .padding(.top, 40)
-                    
+                        .accessibilityLabel(AccessibilityLabels.appMascot)
+
                     CaloriesMacrosView(
                         calories: Int(consumedToday.calories.rounded()),
                         caloriesTarget: Int(
@@ -69,14 +72,13 @@ struct DashboardView: View {
                             "Fiber": Int(nutritionGoal.fibreGrams.rounded())
                         ]
                     )
-                    
+
                     MealListSectionView(dailyMeals: todaysMeals)
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button
-                    {
+                    Button {
                         withAnimation(.spring()) {
                             toggleStreak.toggle()
                         }
@@ -86,19 +88,23 @@ struct DashboardView: View {
                             Text("\(streakCount)")
                         }
                     }
+                    .accessibilityLabel(AccessibilityLabels.Dashboard.streakButton(count: streakCount))
+                    .accessibilityHint(AccessibilityLabels.Dashboard.streakButtonHint(isExpanded: toggleStreak))
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button{
+                    Button {
                         toggleSettings.toggle()
-                    }label:{
+                    } label: {
                         Image(systemName: "person.fill")
                     }
+                    .accessibilityLabel(AccessibilityLabels.Dashboard.settings)
+                    .accessibilityHint(AccessibilityLabels.Dashboard.settingsHint())
                 }
-                
+
                 ToolbarItemGroup(placement: .bottomBar) {
                     Spacer()
-                    
+
                     Menu {
                         Button {
                             mealLogPresentation = .gallery
@@ -110,7 +116,9 @@ struct DashboardView: View {
                                 Text("Choose Photo")
                             }
                         }
-                        
+                        .accessibilityLabel(AccessibilityLabels.Dashboard.choosePhoto)
+                        .accessibilityHint(AccessibilityLabels.Dashboard.choosePhotoHint())
+
                         Button {
                             mealLogPresentation = .camera
                         } label: {
@@ -119,9 +127,13 @@ struct DashboardView: View {
                                 Text("Take Photo")
                             }
                         }
+                        .accessibilityLabel(AccessibilityLabels.Dashboard.takePhoto)
+                        .accessibilityHint(AccessibilityLabels.Dashboard.takePhotoMenuHint())
                     } label: {
                         Label("Add Meal", systemImage: "plus.circle.fill")
                     }
+                    .accessibilityLabel(AccessibilityLabels.Dashboard.addMeal)
+                    .accessibilityHint(AccessibilityLabels.Dashboard.addMealHint())
                     .contentShape(Rectangle())
                 }
             }
@@ -134,12 +146,14 @@ struct DashboardView: View {
                             .glassEffect(in: RoundedRectangle(cornerRadius: 30))
                             .padding(.horizontal, 20)
                             .blur(radius: 1.2)
-                        
+                            .accessibilityHidden(true)
+
                         VStack(alignment: .leading) {
                             Text("Weekly Streak")
                                 .font(.system(size: 20).bold())
                                 .padding(.leading, 40)
-                            
+                                .accessibilityAddTraits(.isHeader)
+
                             HStack(spacing: 10) {
                                 let weekdays = [
                                     "Mo",
@@ -151,7 +165,6 @@ struct DashboardView: View {
                                     "Su"
                                 ]
                                 ForEach(0..<7, id: \.self) { i in
-                                    
                                     VStack {
                                         ZStack {
                                             Rectangle()
@@ -170,7 +183,8 @@ struct DashboardView: View {
                                                     : Color(hex: "B8B8B8")
                                                 )
                                         }
-                                        
+                                        .accessibilityHidden(true)
+
                                         Text(weekdays[i])
                                             .bold()
                                             .foregroundStyle(
@@ -179,13 +193,25 @@ struct DashboardView: View {
                                                 : Color(hex: "5F5F5F")
                                             )
                                     }
-                                                                        
+                                    .accessibilityElement(children: .combine)
+                                    .accessibilityLabel(
+                                        AccessibilityLabels.Dashboard.streakDay(
+                                            weekdays[i],
+                                            isActive: i < streakCount
+                                        )
+                                    )
                                 }
                             }
                             .padding(.horizontal, 40)
+                            .accessibilityElement(children: .contain)
+                            .accessibilityLabel(
+                                AccessibilityLabels.Dashboard.weeklyStreakSummary(activeDays: streakCount)
+                            )
                         }
                     }
                     .contentShape(Rectangle())
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel(AccessibilityLabels.Dashboard.weeklyStreak)
                     .onTapGesture {
                         // empty to consume a tap so it doesn't close when the box is tapped
                     }
@@ -200,7 +226,7 @@ struct DashboardView: View {
             .fullScreenCover(item: $mealLogPresentation) { presentation in
                 MealLogView(
                     onComplete: { meal in
-                        dailyMeals.insert(meal, at: 0)
+                        viewModel.saveMeal(meal, context: modelContext)
                         mealLogPresentation = nil
                     },
                     onCancel: { mealLogPresentation = nil },
@@ -208,13 +234,26 @@ struct DashboardView: View {
                     startsWithGallery: presentation == .gallery
                 )
             }
-            .onTapGesture{
-                if(toggleStreak){withAnimation(.spring()) {toggleStreak.toggle()}}
+            .onTapGesture {
+                if toggleStreak {
+                    withAnimation(.spring()) { toggleStreak.toggle() }
+                }
             }
-            .sheet(isPresented: $toggleSettings){
+            .sheet(isPresented: $toggleSettings) {
                 Settings()
             }
             .background(Color(hex: "F3F3F3"))
+            .onAppear {
+                viewModel.refreshCurrentDate()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    viewModel.refreshCurrentDate()
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+                viewModel.refreshCurrentDate()
+            }
         }
     }
 }

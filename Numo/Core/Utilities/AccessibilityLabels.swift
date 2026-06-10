@@ -24,6 +24,7 @@ enum AccessibilityLabels {
         static let todaysFuel = "Today's fuel"
         static let weeklyStreak = "Weekly streak"
         static let profile = "Profile"
+        static let settings = "Settings"
         static let addMeal = "Add meal"
         static let choosePhoto = "Choose photo"
         static let takePhoto = "Take photo"
@@ -48,6 +49,22 @@ enum AccessibilityLabels {
 
         static func addMealHint() -> String {
             "Opens options to take or choose a meal photo"
+        }
+
+        static func settingsHint() -> String {
+            "Opens app settings"
+        }
+
+        static func choosePhotoHint() -> String {
+            "Opens your photo library to log a meal"
+        }
+
+        static func takePhotoMenuHint() -> String {
+            "Opens the camera to log a meal"
+        }
+
+        static func dismissStreakHint() -> String {
+            "Closes the weekly streak panel"
         }
     }
 

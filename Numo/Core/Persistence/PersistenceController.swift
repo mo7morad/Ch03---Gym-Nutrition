@@ -20,7 +20,7 @@ final class PersistenceController {
 
     private init() {
         do {
-            container = try ModelContainer(for: UserProfile.self)
+            container = try ModelContainer(for: UserProfile.self, LoggedMeal.self)
         } catch {
             // fatalError is appropriate here: if SwiftData cannot set up the database (SwiftData).
             fatalError("Failed to create ModelContainer: \(error)")
