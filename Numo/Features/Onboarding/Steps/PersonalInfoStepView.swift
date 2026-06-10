@@ -37,7 +37,23 @@ struct PersonalInfoStepView: View {
 
                 // MARK: Age
                 fieldLabel("Age")
-                Stepper("\(viewModel.age) years old", value: $viewModel.age, in: 10...100)
+                HStack {
+                    // 1. The typeable text field
+                    TextField("Age", value: $viewModel.age, format: .number)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 40) // Keeps the text box from expanding too much
+                        .multilineTextAlignment(.center)
+                    
+                    // 2. The suffix text
+                    Text("years old")
+                    
+                    Spacer()
+                    
+                    // 3. The Stepper buttons only
+                    Stepper("", value: $viewModel.age, in: 10...100)
+                        .labelsHidden() // This hides the stepper's default label area
+                }
 
                 // MARK: Sex
                 // Picker with .segmented gives a compact, clear toggle for two choices.
@@ -48,18 +64,45 @@ struct PersonalInfoStepView: View {
                 }
                 .pickerStyle(.segmented)
 
-                // MARK: Weight & Height
+                // MARK: - Weight Field
                 fieldLabel("Weight")
                 HStack {
-                    Stepper("\(viewModel.weightKg, specifier: "%.1f") kg",
-                            value: $viewModel.weightKg,
-                            in: 30...250, step: 0.5)
+                    // 1. The typeable text field
+                    TextField("Weight", value: $viewModel.weightKg, format: .number)
+                        .keyboardType(.decimalPad) // Important: Use decimalPad so they can type "65.5"
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 70) // Slightly wider to accommodate decimals comfortably
+                        .multilineTextAlignment(.center)
+                    
+                    // 2. Unit label
+                    Text("kg")
+                    
+                    Spacer()
+                    
+                    // 3. The Stepper buttons
+                    Stepper("", value: $viewModel.weightKg, in: 30...250, step: 0.5)
+                        .labelsHidden()
                 }
 
+                // MARK: - Height Field
                 fieldLabel("Height")
-                Stepper("\(viewModel.heightCm, specifier: "%.0f") cm",
-                        value: $viewModel.heightCm,
-                        in: 100...250, step: 1)
+                HStack {
+                    // 1. The typeable text field
+                    TextField("Height", value: $viewModel.heightCm, format: .number)
+                        .keyboardType(.numberPad) // numberPad is fine here since the step is 1
+                        .textFieldStyle(.roundedBorder)
+                        .frame(width: 70)
+                        .multilineTextAlignment(.center)
+                    
+                    // 2. Unit label
+                    Text("cm")
+                    
+                    Spacer()
+                    
+                    // 3. The Stepper buttons
+                    Stepper("", value: $viewModel.heightCm, in: 100...250, step: 1)
+                        .labelsHidden()
+                }
 
                 Spacer(minLength: 24)
 

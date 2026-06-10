@@ -1,6 +1,6 @@
 import Foundation
 import SwiftData
-
+import SwiftUI
 // @Observable is the modern observation system
 // the macro tracks all stored properties automatically. Views that read a property are re-rendered
 // only when that specific property changes.
@@ -22,8 +22,8 @@ final class OnboardingViewModel {
     }
 
     // MARK: - Step state
-
     var currentStep: Step = .welcome
+    var isGoingBackward: Bool = false
 
     // Set to true after the profile is saved. OnboardingView observes this
     // to know when to dismiss itself and show the Dashboard.
@@ -58,15 +58,40 @@ final class OnboardingViewModel {
     }
 
     // MARK: - Navigation
+        // NEW: Function to handle moving backward
+    
+    
+        func goBack() {
+            isGoingBackward = true
 
-    func advance() {
-        switch currentStep {
-        case .welcome:       currentStep = .personalInfo
-        case .personalInfo:  currentStep = .goalSelection
-        case .goalSelection: currentStep = .summary
-        case .summary:       break
+            withAnimation(.easeInOut(duration: 0.3)) {
+                switch currentStep {
+                case .summary:       currentStep = .goalSelection
+                case .goalSelection: currentStep = .personalInfo
+                case .personalInfo:  currentStep = .welcome
+                case .welcome:       break
+                }
+            }
         }
-    }
+
+            
+        // NEW: Helper to determine if a back button should be visible/enabled
+        var canGoBack: Bool {
+            currentStep != .welcome
+        }
+
+        func advance() {
+            isGoingBackward = false
+
+            withAnimation(.easeInOut(duration: 0.3)) {
+                switch currentStep {
+                case .welcome:       currentStep = .personalInfo
+                case .personalInfo:  currentStep = .goalSelection
+                case .goalSelection: currentStep = .summary
+                case .summary:       break
+                }
+            }
+        }
 
     // MARK: - Completion
 

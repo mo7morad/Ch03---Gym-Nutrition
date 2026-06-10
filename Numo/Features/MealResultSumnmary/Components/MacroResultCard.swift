@@ -9,7 +9,6 @@ import SwiftUI
 
 struct MacroResultCard: View {
     let title: String
-    let iconName: String
     let amount: Double
     let unit: String
     let themeColor: Color
@@ -21,11 +20,9 @@ struct MacroResultCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 4) {
-                Image(systemName: iconName)
-                    .foregroundStyle(themeColor)
 
                 Text(title)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(themeColor)
             }
             .font(.subheadline.weight(.medium))
 
@@ -55,7 +52,6 @@ struct MacroResultCard: View {
     LazyVGrid(columns: columns, spacing: 16) {
         MacroResultCard(
             title: "Calories",
-            iconName: "flame.fill",
             amount: 680,
             unit: "",
             themeColor: .teal
@@ -63,7 +59,6 @@ struct MacroResultCard: View {
 
         MacroResultCard(
             title: "Protein",
-            iconName: "p.circle.fill",
             amount: 24,
             unit: "g",
             themeColor: .pink
@@ -71,7 +66,6 @@ struct MacroResultCard: View {
 
         MacroResultCard(
             title: "Carbs",
-            iconName: "leaf.fill",
             amount: 78,
             unit: "g",
             themeColor: .orange
@@ -79,7 +73,6 @@ struct MacroResultCard: View {
 
         MacroResultCard(
             title: "Fat",
-            iconName: "drop.fill",
             amount: 30,
             unit: "g",
             themeColor: .indigo

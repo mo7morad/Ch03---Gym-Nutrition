@@ -27,41 +27,48 @@ struct OnboardingView: View {
                         .padding(.bottom, 4)
                 }
 
+              
                 Group {
                     switch viewModel.currentStep {
                     case .welcome:
-                        // No slide transition on welcome — it fades in as the first screen.
                         WelcomeStepView(viewModel: viewModel)
-                            .transition(.opacity)
 
                     case .personalInfo:
                         PersonalInfoStepView(viewModel: viewModel)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
-                            ))
 
                     case .goalSelection:
                         GoalSelectionStepView(viewModel: viewModel)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
-                            ))
 
                     case .summary:
                         SummaryStepView(viewModel: viewModel)
-                            .transition(.asymmetric(
-                                insertion: .move(edge: .trailing),
-                                removal: .move(edge: .leading)
-                            ))
                     }
                 }
-                .animation(.easeInOut(duration: 0.3), value: viewModel.currentStep)
+                .id(viewModel.currentStep)
+                .transition(
+                    .asymmetric(
+                        insertion: .move(edge: viewModel.isGoingBackward ? .leading : .trailing),
+                        removal: .move(edge: viewModel.isGoingBackward ? .trailing : .leading)
+                    )
+                )
             }
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             // Hide the nav bar on welcome for a full-bleed, immersive first impression.
             .toolbar(viewModel.currentStep == .welcome ? .hidden : .visible, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if viewModel.canGoBack {
+                        Button(action: {
+                            viewModel.goBack()
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+
+                            }
+                        }
+                    }
+                }
+            }
         }
         // onChange watches isComplete and calls onComplete() as soon as the ViewModel
         // finishes saving. The parent then swaps the root view to Dashboard.

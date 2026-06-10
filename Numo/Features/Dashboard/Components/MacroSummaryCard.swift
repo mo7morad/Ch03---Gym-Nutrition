@@ -41,20 +41,16 @@ struct MacroSummaryCard: View {
             Divider()
                 .overlay(Color(hex: "181818").opacity(0.12))
 
-            HStack(alignment: .center) {
-                Label {
+            HStack(alignment: .center, spacing: 25) {
+                
                     Text(String(format: "%.0f kcal", meal.totalNutrition.calories))
-                } icon: {
-                    Image(systemName: "flame.fill")
-                }
+                
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color(hex: "10937E"))
 
-                Label {
+               
                     Text(String(format: "%.0fg", meal.totalNutrition.protein))
-                } icon: {
-                    Image(systemName: "p.circle.fill")
-                }
+                
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color(hex: "D16D8E"))
 

@@ -27,7 +27,7 @@ struct PhotoResultSummary: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-//        ZStack (alignment: .bottomLeading){
+        ZStack (alignment: .bottomLeading){
             ScrollView(.vertical, showsIndicators: true) {
                 VStack(alignment: .leading, spacing: 15) {
                     mealPhotoView
@@ -54,22 +54,24 @@ struct PhotoResultSummary: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
                 .padding(.bottom, 120)
-            
-                    
+                
+                
+                
             }
+            if context == .loggedMeal {
+                Image("MealLoggedHappy")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 400)
+                    .offset(x: -80, y: 190)
+                    .allowsHitTesting(false)
+            }
+        }
             
             .ignoresSafeArea(.all, edges: .bottom)
             .scrollBounceBehavior(.basedOnSize)
     
-            .overlay (alignment: .bottomLeading){
-            Image("MealLoggedHappy")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 400, height: 190)
-                .offset(x: -100, y: 100)
-                .ignoresSafeArea(.all, edges: .bottom)
-                .accessibilityHidden(true)
-            }
+            
             
             
 //        }
@@ -134,13 +136,13 @@ struct PhotoResultSummary: View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
                 MacroResultCard(
-                    title: "Calories", iconName: "heart",
+                    title: "Calories",
                     amount: totals.calories,
                     unit: "kcal",
                     themeColor: Color(hex: "10937E")
                 )
                 MacroResultCard(
-                    title: "Protein", iconName: "heart",
+                    title: "Protein",
                     amount: totals.protein,
                     unit: "g",
                     themeColor: Color(hex: "D16D8E")
@@ -149,13 +151,13 @@ struct PhotoResultSummary: View {
 
             HStack(spacing: 12) {
                 MacroResultCard(
-                    title: "Carbs", iconName: "heart",
+                    title: "Carbs",
                     amount: totals.carbs,
                     unit: "g",
                     themeColor: .orange
                 )
                 MacroResultCard(
-                    title: "Fat", iconName: "heart",
+                    title: "Fat",
                     amount: totals.fat,
                     unit: "g",
                     themeColor: .indigo
@@ -164,7 +166,7 @@ struct PhotoResultSummary: View {
 
             HStack(spacing: 12) {
                 MacroResultCard(
-                    title: "Fiber", iconName: "",
+                    title: "Fiber", 
                     amount: totals.fiber,
                     unit: "g",
                     themeColor: Color(hex: "8A9B3B")
