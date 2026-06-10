@@ -5,6 +5,8 @@ struct DashboardView: View {
     @Query private var profiles: [UserProfile]
     
     @State private var toggleStreak: Bool = false
+    @State private var toggleSettings: Bool = false
+
     @State private var mealLogPresentation: MealLogPresentation?
     @State private var dailyMeals: [MealEntry] = []
     
@@ -46,7 +48,6 @@ struct DashboardView: View {
                         .resizable()
                         .frame(width: 220, height: 150)
                         .padding(.top, 40)
-                        .accessibilityLabel(AccessibilityLabels.appMascot)
                     
                     CaloriesMacrosView(
                         calories: Int(consumedToday.calories.rounded()),
@@ -85,13 +86,14 @@ struct DashboardView: View {
                             Text("\(streakCount)")
                         }
                     }
-                    .accessibilityLabel(AccessibilityLabels.Dashboard.streakButton(count: streakCount))
-                    .accessibilityHint(AccessibilityLabels.Dashboard.streakButtonHint(isExpanded: toggleStreak))
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Image(systemName: "person.fill")
-                        .accessibilityLabel(AccessibilityLabels.Dashboard.profile)
+                    Button{
+                        toggleSettings.toggle()
+                    }label:{
+                        Image(systemName: "person.fill")
+                    }
                 }
                 
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -120,8 +122,6 @@ struct DashboardView: View {
                     } label: {
                         Label("Add Meal", systemImage: "plus.circle.fill")
                     }
-                    .accessibilityLabel(AccessibilityLabels.Dashboard.addMeal)
-                    .accessibilityHint(AccessibilityLabels.Dashboard.addMealHint())
                     .contentShape(Rectangle())
                 }
             }
@@ -139,7 +139,6 @@ struct DashboardView: View {
                             Text("Weekly Streak")
                                 .font(.system(size: 20).bold())
                                 .padding(.leading, 40)
-                                .accessibilityAddTraits(.isHeader)
                             
                             HStack(spacing: 10) {
                                 let weekdays = [
@@ -180,21 +179,10 @@ struct DashboardView: View {
                                                 : Color(hex: "5F5F5F")
                                             )
                                     }
-                                    .accessibilityElement(children: .combine)
-                                    .accessibilityLabel(
-                                        AccessibilityLabels.Dashboard.streakDay(
-                                            weekdays[i],
-                                            isActive: i < streakCount
-                                        )
-                                    )
                                                                         
                                 }
                             }
                             .padding(.horizontal, 40)
-                            .accessibilityElement(children: .contain)
-                            .accessibilityLabel(
-                                AccessibilityLabels.Dashboard.weeklyStreakSummary(activeDays: streakCount)
-                            )
                         }
                     }
                     .contentShape(Rectangle())
@@ -222,6 +210,9 @@ struct DashboardView: View {
             }
             .onTapGesture{
                 if(toggleStreak){withAnimation(.spring()) {toggleStreak.toggle()}}
+            }
+            .sheet(isPresented: $toggleSettings){
+                Settings()
             }
             .background(Color(hex: "F3F3F3"))
         }
