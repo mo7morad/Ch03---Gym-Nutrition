@@ -10,10 +10,15 @@ struct GoalSelectionStepView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("What's your goal?")
                     .font(.title2).bold()
+                    .accessibilityAddTraits(.isHeader)
                 Text("This adjusts your daily calorie target.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(
+                "\(AccessibilityLabels.Onboarding.goalSelectionTitle). \(AccessibilityLabels.Onboarding.goalSelectionSubtitle)"
+            )
             .padding(.top, 8)
 
             VStack(spacing: 12) {
@@ -57,6 +62,7 @@ struct GoalSelectionStepView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityLabel(AccessibilityLabels.continueAction)
         }
         .padding(.horizontal, 20)
     }

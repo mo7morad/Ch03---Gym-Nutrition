@@ -37,6 +37,8 @@ struct PhotoResultSummary: View {
                         .foregroundStyle(Color(hex: "181818"))
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityLabel(AccessibilityLabels.mealHeadline(meal.mealHeadline))
+                        .accessibilityAddTraits(.isHeader)
                     
                     macroGrid
                     
@@ -66,6 +68,7 @@ struct PhotoResultSummary: View {
                 .frame(width: 400, height: 190)
                 .offset(x: -100, y: 100)
                 .ignoresSafeArea(.all, edges: .bottom)
+                .accessibilityHidden(true)
             }
             
             
@@ -73,7 +76,6 @@ struct PhotoResultSummary: View {
         
         .scrollBounceBehavior(.basedOnSize)
         .background(Color(hex: "F3F3F3"))
-        .preferredColorScheme(.light)
         .navigationTitle(meal.mealPeriodTitle)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(context == .loggedMeal)
@@ -84,7 +86,9 @@ struct PhotoResultSummary: View {
                         .fontWeight(.semibold)
                         .foregroundStyle(Color(hex: "181818"))
                 }
-                .accessibilityLabel(context == .loggedMeal ? "Back" : "Close")
+                .accessibilityLabel(
+                    context == .loggedMeal ? AccessibilityLabels.back : AccessibilityLabels.close
+                )
             }
         }
     }
@@ -121,7 +125,7 @@ struct PhotoResultSummary: View {
         .frame(height: photoHeight)
         .clipped()
         .clipShape(RoundedRectangle(cornerRadius: 20))
-        .accessibilityLabel(meal.photoRef == nil ? "Meal photo placeholder" : "Meal photo")
+        .accessibilityLabel(AccessibilityLabels.mealPhoto(hasPhoto: meal.photoRef != nil))
     }
 
     // MARK: - Macros
@@ -186,6 +190,7 @@ struct PhotoResultSummary: View {
                 .opacity(0.5)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityLabel(AccessibilityLabels.ingredients(meal.ingredientsLabel))
         }
     }
 
@@ -200,8 +205,8 @@ struct PhotoResultSummary: View {
                 .frame(height: 52)
                 .background(.black, in: RoundedRectangle(cornerRadius: 50))
         }
-        .accessibilityLabel("Done")
-        .accessibilityHint("Logs this meal")
+        .accessibilityLabel(AccessibilityLabels.done)
+        .accessibilityHint(AccessibilityLabels.MealLog.doneHint())
     }
 }
 

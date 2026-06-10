@@ -69,6 +69,9 @@ struct MacroElement: View {
                 .cornerRadius(32) // what even dude
                 .padding(.horizontal, 5)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(AccessibilityLabels.macroRemaining(macrotype, grams: remaining))
+            .accessibilityValue(AccessibilityLabels.macroProgress(macrotype, consumed: progress, target: target))
         }
         .padding(.top, 15)
         .padding(.bottom, 30)

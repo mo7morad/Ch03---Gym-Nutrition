@@ -18,11 +18,13 @@ struct AnalysisResultView: View {
                         FoodItemRow(item: item)
                     }
                 }
+                .accessibilityLabel(AccessibilityLabels.MealLog.detectedFoods)
 
                 Section("Meal Totals") {
                     NutrientBreakdownView(nutrition: total)
                         .padding(.vertical, 8)
                 }
+                .accessibilityLabel(AccessibilityLabels.MealLog.mealTotals)
             }
             .listStyle(.insetGrouped)
             .navigationTitle("Meal Summary")
@@ -30,10 +32,14 @@ struct AnalysisResultView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Retake", action: onRetake)
+                        .accessibilityLabel(AccessibilityLabels.MealLog.retake)
+                        .accessibilityHint(AccessibilityLabels.MealLog.retakeHint())
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Log Meal", action: onLog)
                         .bold()
+                        .accessibilityLabel(AccessibilityLabels.MealLog.logMeal)
+                        .accessibilityHint(AccessibilityLabels.MealLog.logMealHint())
                 }
             }
         }

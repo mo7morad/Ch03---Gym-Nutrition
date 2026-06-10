@@ -25,14 +25,16 @@ struct WelcomeStepView: View {
                     .spring(duration: 0.7, bounce: 0.45),
                     value: appeared
                 )
+                .accessibilityLabel(AccessibilityLabels.appMascot)
 
             Spacer().frame(height: 44)
 
             // MARK: Copy
             // Text fades up slightly after the character lands.
             VStack(spacing: 10) {
-                Text("NutriTrack")
+                Text("Numo")
                     .font(.largeTitle).bold()
+                    .accessibilityAddTraits(.isHeader)
                     // TODO: replace with DesignSystem token
 
                 Text("Tell us about yourself and we'll build\nyour personal nutrition plan.")
@@ -41,6 +43,10 @@ struct WelcomeStepView: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(
+                "\(AccessibilityLabels.Onboarding.welcomeTitle). \(AccessibilityLabels.Onboarding.welcomeSubtitle)"
+            )
             .opacity(appeared ? 1.0 : 0)
             .offset(y: appeared ? 0 : 14)
             .animation(.easeOut(duration: 0.45).delay(0.25), value: appeared)
@@ -58,6 +64,7 @@ struct WelcomeStepView: View {
                     .frame(height: 54)
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityLabel(AccessibilityLabels.getStarted)
             .opacity(appeared ? 1.0 : 0)
             .animation(.easeOut(duration: 0.4).delay(0.45), value: appeared)
             .padding(.bottom, 20)

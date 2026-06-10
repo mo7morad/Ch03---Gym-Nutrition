@@ -1,25 +1,22 @@
 import SwiftUI
 
-/// Mascot peeking in from the bottom-left with a speech-style confirmation message.
 struct MealLoggedConfirmationView: View {
-    private let mascotAspectRatio: CGFloat = 319 / 192
+    private let mascotAspectRatio: CGFloat = 319.0 / 192.0
     private let mascotRotation: Double = 13
     private let mascotWidth: CGFloat = 300
 
-    /// Space so scroll content clears the mascot footer.
     static let scrollBottomInset: CGFloat = 168
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             mascot
-
             messageCluster
         }
         .frame(maxWidth: .infinity)
         .frame(height: Self.scrollBottomInset, alignment: .bottomLeading)
         .allowsHitTesting(false)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Your meal is logged!")
+        .accessibilityLabel(AccessibilityLabels.mealLoggedConfirmation)
     }
 
     private var mascot: some View {
@@ -29,6 +26,7 @@ struct MealLoggedConfirmationView: View {
             .frame(width: mascotWidth, height: mascotWidth / mascotAspectRatio)
             .rotationEffect(.degrees(mascotRotation))
             .offset(x: -32, y: 52)
+            .accessibilityHidden(true)
     }
 
     private var messageCluster: some View {
@@ -48,7 +46,7 @@ struct MealLoggedConfirmationView: View {
 }
 
 private struct MealLoggedSpeechConnector: Shape {
-    func path(in rect: CGRect) -> Path {
+    nonisolated func path(in rect: CGRect) -> Path {
         var path = Path()
         path.move(to: CGPoint(x: rect.minX + 8, y: rect.minY + 6))
         path.addCurve(

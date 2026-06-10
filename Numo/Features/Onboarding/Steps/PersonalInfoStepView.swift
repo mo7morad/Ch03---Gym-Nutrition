@@ -16,11 +16,16 @@ struct PersonalInfoStepView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Let's get to know you")
                         .font(.title2).bold()
+                        .accessibilityAddTraits(.isHeader)
                         // TODO: replace with DesignSystem token
                     Text("We'll use this to calculate your daily nutrition targets.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(
+                    "\(AccessibilityLabels.Onboarding.personalInfoTitle). \(AccessibilityLabels.Onboarding.personalInfoSubtitle)"
+                )
                 .padding(.top, 8)
 
                 // MARK: Name
@@ -67,6 +72,7 @@ struct PersonalInfoStepView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityLabel(AccessibilityLabels.continueAction)
                 .disabled(viewModel.name.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             .padding(.horizontal, 20)

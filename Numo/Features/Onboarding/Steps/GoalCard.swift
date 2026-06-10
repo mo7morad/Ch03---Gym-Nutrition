@@ -45,6 +45,15 @@ struct GoalCard: View {
             )
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(
+            AccessibilityLabels.Onboarding.goalCard(
+                title: title,
+                subtitle: subtitle,
+                isSelected: isSelected
+            )
+        )
+        .accessibilityHint(AccessibilityLabels.Onboarding.goalCardHint())
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

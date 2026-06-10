@@ -10,10 +10,15 @@ struct SummaryStepView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("Your daily targets")
                     .font(.title2).bold()
+                    .accessibilityAddTraits(.isHeader)
                 Text("Based on your profile and goal.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(
+                "\(AccessibilityLabels.Onboarding.summaryTitle). \(AccessibilityLabels.Onboarding.summarySubtitle)"
+            )
             .padding(.top, 8)
 
             // computedGoal is derived from ViewModel fields — reading it here causes
@@ -73,6 +78,7 @@ struct SummaryStepView: View {
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityLabel(viewModel.isSaving ? AccessibilityLabels.Onboarding.savingProfile() : AccessibilityLabels.letsGo)
             .disabled(viewModel.isSaving)
         }
         .padding(.horizontal, 20)

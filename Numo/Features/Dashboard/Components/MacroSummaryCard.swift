@@ -72,6 +72,16 @@ struct MacroSummaryCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(hex: "E8E8E8"))
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            AccessibilityLabels.mealSummary(
+                period: meal.mealPeriodTitle,
+                items: itemsSummary,
+                calories: meal.totalNutrition.calories,
+                protein: meal.totalNutrition.protein,
+                time: timeString
+            )
+        )
     }
 }
 

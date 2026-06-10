@@ -20,7 +20,11 @@ struct StepProgressBar: View {
                     .fill(index <= stepIndex ? Color.accentColor : Color(.systemGray5))
                     .frame(height: 4)
                     .animation(.easeInOut, value: stepIndex)
+                    .accessibilityHidden(true)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(AccessibilityLabels.Onboarding.progress)
+        .accessibilityValue(AccessibilityLabels.Onboarding.progressValue(step: stepIndex + 1, total: 3))
     }
 }

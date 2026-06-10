@@ -42,7 +42,7 @@ struct MacroResultCard: View {
                 .fill(Color.white)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(title), \(formattedAmount)")
+        .accessibilityLabel(AccessibilityLabels.macroResult(title: title, amount: formattedAmount))
     }
 }
 

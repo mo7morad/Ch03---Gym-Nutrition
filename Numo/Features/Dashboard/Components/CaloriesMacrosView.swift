@@ -36,12 +36,15 @@ struct CaloriesMacrosView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Today's Fuel")
                     .font(.system(size: 28, weight: .bold))
+                    .accessibilityAddTraits(.isHeader)
                 
                 Text(Date(), style: .date)
                     .font(.system(size: 12, weight: .regular))
                     .foregroundStyle(Color(hex: "181818"))
                     .opacity(0.5)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(AccessibilityLabels.Dashboard.todaysFuel)
             .padding(.leading, 15)
             .padding(.vertical, 20)
             Spacer()
@@ -95,6 +98,11 @@ struct CaloriesMacrosView: View {
                         .opacity(0.4)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
+                .accessibilityLabel(
+                    isExpanded
+                    ? AccessibilityLabels.Dashboard.collapseMacros
+                    : AccessibilityLabels.Dashboard.expandMacros
+                )
             }
             .padding(.bottom, 3)
             
@@ -129,6 +137,9 @@ struct CaloriesMacrosView: View {
                 .cornerRadius(32)
                 .padding(.horizontal, 5)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(AccessibilityLabels.caloriesRemaining(caloriesRemaining))
+            .accessibilityValue(AccessibilityLabels.caloriesProgress(consumed: calories, target: caloriesTarget))
         }
     }
 

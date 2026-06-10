@@ -114,12 +114,17 @@ struct MealLogView: View {
                     VStack(spacing: 16) {
                         Text("Add Your Meal")
                             .font(.title.weight(.bold))
+                            .accessibilityAddTraits(.isHeader)
 
                         Text("Take a photo or pick one from your library")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                     .multilineTextAlignment(.center)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(
+                        "\(AccessibilityLabels.MealLog.addYourMeal). \(AccessibilityLabels.MealLog.addYourMealSubtitle)"
+                    )
                     .padding(.bottom, 32)
 
                     VStack(spacing: 16) {
@@ -137,6 +142,8 @@ struct MealLogView: View {
                             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(AccessibilityLabels.MealLog.takePhoto)
+                        .accessibilityHint(AccessibilityLabels.MealLog.takePhotoHint())
 
                         PhotosPicker(selection: $selectedItem, matching: .images) {
                             VStack(spacing: 10) {
@@ -150,6 +157,8 @@ struct MealLogView: View {
                             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(AccessibilityLabels.MealLog.chooseFromGallery)
+                        .accessibilityHint(AccessibilityLabels.MealLog.chooseFromGalleryHint())
                     }
                     .padding(.horizontal, 32)
 
@@ -163,6 +172,7 @@ struct MealLogView: View {
                     } label: {
                         Label("Close", systemImage: "xmark")
                     }
+                    .accessibilityLabel(AccessibilityLabels.close)
                 }
             }
         }
@@ -209,6 +219,7 @@ struct MealLogView: View {
                 .scaledToFit()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(.ultraThinMaterial)
+                .accessibilityHidden(true)
 
             VStack(spacing: 16) {
                 ProgressView()
@@ -218,6 +229,8 @@ struct MealLogView: View {
                     .font(.headline)
                     .foregroundStyle(.white)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(AccessibilityLabels.MealLog.analyzing)
         }
     }
 
@@ -233,6 +246,7 @@ struct MealLogView: View {
                 .scaledToFit()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(.ultraThinMaterial)
+                .accessibilityHidden(true)
 
             VStack(spacing: 16) {
                 Text(error.localizedDescription)
@@ -249,6 +263,8 @@ struct MealLogView: View {
                         .padding(.vertical, 10)
                 }
                 .background(.ultraThinMaterial, in: Capsule())
+                .accessibilityLabel(AccessibilityLabels.MealLog.tryAgain)
+                .accessibilityHint(AccessibilityLabels.MealLog.tryAgainHint())
 
                 Button {
                     viewModel.retake()
@@ -259,6 +275,8 @@ struct MealLogView: View {
                         .padding(.vertical, 10)
                 }
                 .background(.ultraThinMaterial, in: Capsule())
+                .accessibilityLabel(AccessibilityLabels.MealLog.retakePhoto)
+                .accessibilityHint(AccessibilityLabels.MealLog.retakePhotoHint())
             }
             .padding(32)
         }

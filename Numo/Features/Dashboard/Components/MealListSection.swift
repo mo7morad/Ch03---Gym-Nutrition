@@ -10,6 +10,7 @@ struct MealListSectionView: View {
                     MacroSummaryCard(meal: meal)
                 }
                 .buttonStyle(.plain)
+                .accessibilityHint(AccessibilityLabels.mealSummaryHint())
             }
         }
         .padding(.horizontal, 16)

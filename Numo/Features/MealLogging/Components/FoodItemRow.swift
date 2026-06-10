@@ -25,6 +25,14 @@ struct FoodItemRow: View {
             .font(.caption)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            AccessibilityLabels.foodItem(
+                name: displayName,
+                calories: Int(item.nutrition.calories),
+                protein: Int(item.nutrition.protein)
+            )
+        )
     }
 }
 

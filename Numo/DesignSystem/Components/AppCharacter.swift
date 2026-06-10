@@ -14,6 +14,7 @@ struct AppCharacter: View {
             .resizable()
             .scaledToFit()
             .frame(width: width, height: width / aspectRatio)
+            .accessibilityLabel(AccessibilityLabels.appMascot)
     }
 }
 
